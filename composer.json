@@ -1,0 +1,30 @@
+{
+    "name": "netresearch/composer-patches-plugin",
+    "type": "composer-plugin",
+    "license": "GPL-2.0",
+    "description": "Composer patches plugin",
+    "keywords": [
+        "composer", "patches", "plugin"
+    ],
+    "homepage": "",
+    "authors": [
+        {
+            "name": "Christian Opitz",
+            "email": "christian.opitz@netresearch.de"
+        }
+        
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": { "": "src/"}
+    },
+    "require-dev": {
+        "composer/composer": "1.*"
+    },
+    "extra": {
+        "class": "Netresearch\\Composer\\Patches\\Plugin",
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "name": "vendor/package",
+    "license": "GPL-2.0",
+    "description": "Test package",
+    "keywords": [
+        "test"
+    ],
+    "homepage": "",
+    "authors": [
+        {
+            "name": "Christian Opitz",
+            "email": "christian.opitz@netresearch.de"
+        }
+
+    ],
+    "autoload": {
+        "psr-0": { "": "src/"}
+    },
+    "minimum-stability": "dev"
+}

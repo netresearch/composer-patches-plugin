@@ -1,0 +1,64 @@
+diff --git a/res/template/anotherTemplate.html b/res/template/anotherTemplate.html
+new file mode 100644
+index 0000000..cc9b532
+--- /dev/null
++++ b/res/template/anotherTemplate.html
+@@ -0,0 +1,22 @@
++<!DOCTYPE html>
++<!--                                                                   *
++This script belongs to the Composer-TYPO3-Installer package            *
++(c) 2014 Netresearch GmbH & Co. KG                                     *
++This copyright notice MUST APPEAR in all copies of the script!         *
++                                                                       *
++It is free software; you can redistribute it and/or modify it under    *
++the terms of the GNU Lesser General Public License, either version 3   *
++of the License, or (at your option) any later version.                 *
++                                                                       *
++The TYPO3 project - inspiring people to share!                         *
++                                                                     -->
++<html>
++  <head>
++    <title>This is some template without any logic</title>
++    <meta charset="UTF-8">
++    <meta name="viewport" content="width=device-width">
++  </head>
++  <body>
++    <div>Here is some content</div>
++    <p>Lorem ipsum dolor sit amet consectetuer Sed orci ac laoreet quam. Wisi cursus semper tempus Nam neque fringilla eros et nec montes. Tristique Cum consequat ac mus et sed elit velit fermentum sollicitudin. Vestibulum molestie felis Curabitur tincidunt leo feugiat at pretium purus lorem. Laoreet lacus justo interdum amet Donec interdum elit vel Curabitur pellentesque. Sed nisl lorem diam nibh nibh ut porttitor eget turpis.</p>
++    <p>Amet interdum tristique faucibus Aliquam Vestibulum accumsan et Nulla metus adipiscing. Nec nulla orci consequat nibh eget lacus interdum Nam elit aliquam. Aenean morbi eu ac metus tempor et Ut tellus accumsan et. Id Curabitur velit dui hendrerit risus rhoncus augue justo pretium risus. Iaculis lobortis dis auctor netus orci id amet eu tincidunt metus. Felis turpis leo feugiat Nam dolor Nam faucibus adipiscing.</p>
++    <p>Id eu eu odio dui condimentum ut id sem auctor Nam. Et felis gravida at Duis pellentesque pellentesque platea sit ut Vivamus. Mollis leo volutpat condimentum facilisis Sed fames tellus dis justo Sed. At nunc dolor Pellentesque metus facilisis sagittis felis cursus adipiscing tempor. Faucibus quam Phasellus diam Vestibulum ante elit eu laoreet pellentesque dolor. Cras cursus est ut.</p>
++    <p>Libero dolor Nam ante lacus id vitae Aenean rutrum semper ultrices. Risus ligula mauris hendrerit Donec pellentesque eu Vestibulum tincidunt nibh netus. Dolor quis pretium ante elit Aliquam magnis libero nascetur Morbi turpis. Vestibulum sagittis risus nunc ligula urna libero malesuada Aenean eu interdum. Hac mattis tellus ipsum pretium volutpat mauris id eu Nam tortor. Justo porttitor quis Morbi auctor lorem elit in in Quisque In. Fusce massa.</p>
++  </body>
++</html>
+diff --git a/res/template/someTemplate.html b/res/template/someTemplate.html
+deleted file mode 100644
+index cc9b532..0000000
+--- a/res/template/someTemplate.html
++++ /dev/null
+@@ -1,26 +0,0 @@
+-<!DOCTYPE html>
+-<!--                                                                   *
+-This script belongs to the Composer-TYPO3-Installer package            *
+-(c) 2014 Netresearch GmbH & Co. KG                                     *
+-This copyright notice MUST APPEAR in all copies of the script!         *
+-                                                                       *
+-It is free software; you can redistribute it and/or modify it under    *
+-the terms of the GNU Lesser General Public License, either version 3   *
+-of the License, or (at your option) any later version.                 *
+-                                                                       *
+-The TYPO3 project - inspiring people to share!                         *
+-                                                                     -->
+-<html>
+-  <head>
+-    <title>This is some template without any logic</title>
+-    <meta charset="UTF-8">
+-    <meta name="viewport" content="width=device-width">
+-  </head>
+-  <body>
+-    <div>Here is some content</div>
+-    <p>Lorem ipsum dolor sit amet consectetuer Sed orci ac laoreet quam. Wisi cursus semper tempus Nam neque fringilla eros et nec montes. Tristique Cum consequat ac mus et sed elit velit fermentum sollicitudin. Vestibulum molestie felis Curabitur tincidunt leo feugiat at pretium purus lorem. Laoreet lacus justo interdum amet Donec interdum elit vel Curabitur pellentesque. Sed nisl lorem diam nibh nibh ut porttitor eget turpis.</p>
+-    <p>Amet interdum tristique faucibus Aliquam Vestibulum accumsan et Nulla metus adipiscing. Nec nulla orci consequat nibh eget lacus interdum Nam elit aliquam. Aenean morbi eu ac metus tempor et Ut tellus accumsan et. Id Curabitur velit dui hendrerit risus rhoncus augue justo pretium risus. Iaculis lobortis dis auctor netus orci id amet eu tincidunt metus. Felis turpis leo feugiat Nam dolor Nam faucibus adipiscing.</p>
+-    <p>Id eu eu odio dui condimentum ut id sem auctor Nam. Et felis gravida at Duis pellentesque pellentesque platea sit ut Vivamus. Mollis leo volutpat condimentum facilisis Sed fames tellus dis justo Sed. At nunc dolor Pellentesque metus facilisis sagittis felis cursus adipiscing tempor. Faucibus quam Phasellus diam Vestibulum ante elit eu laoreet pellentesque dolor. Cras cursus est ut.</p>
+-    <p>Libero dolor Nam ante lacus id vitae Aenean rutrum semper ultrices. Risus ligula mauris hendrerit Donec pellentesque eu Vestibulum tincidunt nibh netus. Dolor quis pretium ante elit Aliquam magnis libero nascetur Morbi turpis. Vestibulum sagittis risus nunc ligula urna libero malesuada Aenean eu interdum. Hac mattis tellus ipsum pretium volutpat mauris id eu Nam tortor. Justo porttitor quis Morbi auctor lorem elit in in Quisque In. Fusce massa.</p>
+-  </body>
+-</html>

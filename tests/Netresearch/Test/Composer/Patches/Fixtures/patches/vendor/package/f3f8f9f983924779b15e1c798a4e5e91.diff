@@ -1,0 +1,52 @@
+diff --git a/src/Vendor/Package/SomeClass.php b/src/Vendor/Package/SomeClass.php
+index 19aefce..1cff030 100644
+--- a/src/Vendor/Package/SomeClass.php
++++ b/src/Vendor/Package/SomeClass.php
+@@ -13,7 +13,21 @@
+  * The TYPO3 project - inspiring people to share!                         *
+  *                                                                        */
+
++/**
++ * Some documentation
++ *
++ * @package Vendor/Package
++ * @author Christian Opitz <christian.opitz at netresearch.de>
++ */
+ class SomeClass implements SomeInterface {
++	/**
++	 * This function does something - but nothing serious, actually
++	 *
++	 * @param string $arg1 An argument
++	 * @param string $arg2 Another argument
++	 * @param string $arg3 And another argument
++	 * @return boolean This method returns something
++	 */
+ 	public function someMethod($arg1, $arg2, $arg3) {
+ 		echo "This method wasn\'t ment to be called";
+ 		return FALSE;
+diff --git a/src/Vendor/Package/SomeInterface.php b/src/Vendor/Package/SomeInterface.php
+index 6ff78ea..350fe07 100644
+--- a/src/Vendor/Package/SomeInterface.php
++++ b/src/Vendor/Package/SomeInterface.php
+@@ -13,6 +13,20 @@
+  * The TYPO3 project - inspiring people to share!                         *
+  *                                                                        */
+
++/**
++ * Some interface
++ *
++ * @package Vendor/Package
++ * @author Christian Opitz <christian.opitz at netresearch.de>
++ */
+ interface SomeInterface {
++	/**
++	 * This function does something
++	 *
++	 * @param string $arg1 An argument
++	 * @param string $arg2 Another argument
++	 * @param string $arg3 And another argument
++	 * @return boolean This method returns something
++	 */
+ 	public function someMethod($arg1, $arg2, $arg3);
+ }
+\ No newline at end of file

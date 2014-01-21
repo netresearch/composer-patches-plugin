@@ -1,0 +1,19 @@
+diff --git a/src/Vendor/Package/SomeClass.php b/src/Vendor/Package/SomeClass.php
+index 19aefce..8d842cb 100644
+--- a/src/Vendor/Package/SomeClass.php
++++ b/src/Vendor/Package/SomeClass.php
+@@ -16,6 +16,12 @@
+ class SomeClass implements SomeInterface {
+ 	public function someMethod($arg1, $arg2, $arg3) {
+ 		echo "This method wasn\'t ment to be called";
+-		return FALSE;
++		echo 'Arg1:' . $arg1;
++		echo 'Arg2:' . $arg2;
++		echo 'Arg3:' . $arg3;
++		if ($arg1 && $arg2) {
++			return FALSE;
++		}
++		return TRUE;
+ 	}
+ }
+\ No newline at end of file

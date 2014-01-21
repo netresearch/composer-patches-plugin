@@ -1,0 +1,19 @@
+{
+    "package": "typo3/cms",
+    "version": "6.2.0-beta1",
+    "types": {
+        "typo3/git": {
+            "patch-url": "https://git.typo3.org/Packages/TYPO3.CMS.git/patch/{$id}",
+            "issue-url": "http://forge.typo3.org/issues/{$resolves}",
+            "default": true
+        }
+    },
+    "patches": {
+        "32f331fead9c7aa50d9248c54e3c0af75d793539": {
+            "title": "[FEATURE] Allow registration of different login forms"
+        },
+        "c38e882bf2943883c48cd2867f07019fb0e0e594": {
+            "title": "[FEATURE] Hook Request for t3lib_db"
+        }
+    }
+}
