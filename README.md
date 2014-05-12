@@ -12,7 +12,7 @@ You can provide the patches in any package through the extra object (you are fre
 
 ***
 composer.json:
-```javascript
+```json
 {
     "name": "netresearch/typo3-patches",
     "version": "1.0.0",
@@ -99,7 +99,7 @@ http://example.com/typo3-patches.json
 ```
 ## Requiring the patches:
 just require the package with the patches. If you don't want a patch package outside the root package, consider providing it as package in the [repositories key](https://getcomposer.org/doc/04-schema.md#repositories)
-```
+```json
 {
     "name": "netresearch/patched-typo3",
     "type": "project",
