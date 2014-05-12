@@ -220,6 +220,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 			$patchSets[$initialPackage->getName()] = array($extra['patches'], $packages);
 		}
 
+		// Patches may also be defined in the root package.
+		$rootPackage = $this->composer->getPackage();
+		$extra = $rootPackage->getExtra();
+		if (!empty($extra['patches'])) {
+		  foreach (array_keys($extra['patches']) as $packageName) {
+		      $packages = $this->composer->getRepositoryManager()->getLocalRepository()->findPackages($packageName);
+		      $patchSets[$rootPackage->getName()] = array($extra['patches'], $packages);
+		  }
+		}
+
 		$patchesAndPackages = array();
 		foreach ($patchSets as $sourceName => $patchConfAndPackages) {
 			$patchSet = new PatchSet($patchConfAndPackages[0], $this->downloader);
