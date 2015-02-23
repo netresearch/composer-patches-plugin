@@ -1,5 +1,5 @@
 {
-    "name": "blakestein/composer-patches-plugin",
+    "name": "netresearch/composer-patches-plugin",
     "type": "composer-plugin",
     "license": "GPL-2.0",
     "description": "Composer patches plugin",
