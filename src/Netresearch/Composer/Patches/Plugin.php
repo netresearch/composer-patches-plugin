@@ -200,7 +200,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 
 	/**
 	 * Get the patches and packages that are not already in $history
-	 * 
+	 *
 	 * @param \Composer\Package\PackageInterface $initialPackage
 	 * @param array &$history
 	 * @return array
@@ -243,7 +243,27 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 	 * @return string
 	 */
 	protected function getPackagePath(PackageInterface $package) {
-		return $this->composer->getInstallationManager()->getInstallPath($package);
+		$c_extra = $this->composer->getPackage()->getExtra();
+		$p_extra = $package->getExtra();
+
+		// handle package level config
+		// ---------------------------
+		$targetDir = isset($p_extra['target-dir'])
+			? realpath('./' . trim($p_extra['target-dir'], '/')) . '/'
+			: $this->composer->getInstallationManager()->getInstallPath($package);
+		// handle overrides
+		// ---------------------------
+		if (isset($c_extra['installer-paths'])) {
+			foreach ($c_extra['installer-paths'] as $path => $pkgs) {
+				foreach ($pkgs as $pkg) {
+					if ($pkg == $package->getName()) {
+						$targetDir = realpath('./' . trim($path, '/')) . '/';
+					}
+				}
+			}
+		}
+
+		return $targetDir;
 	}
 
 	/**

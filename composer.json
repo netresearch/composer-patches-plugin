@@ -1,5 +1,5 @@
 {
-    "name": "netresearch/composer-patches-plugin",
+    "name": "blakestein/composer-patches-plugin",
     "type": "composer-plugin",
     "license": "GPL-2.0",
     "description": "Composer patches plugin",
@@ -11,7 +11,7 @@
             "name": "Christian Opitz",
             "email": "christian.opitz@netresearch.de"
         }
-        
+
     ],
     "minimum-stability": "dev",
     "autoload": {
@@ -19,7 +19,7 @@
     },
     "require": {
         "composer-plugin-api": "1.0.0"
-    },    
+    },
     "require-dev": {
         "composer/composer": "1.*"
     },
