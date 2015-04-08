@@ -98,7 +98,8 @@ http://example.com/typo3-patches.json
 }
 ```
 ## Requiring the patches:
-just require the package with the patches. If you don't want a patch package outside the root package, consider providing it as package in the [repositories key](https://getcomposer.org/doc/04-schema.md#repositories)
+just require the package with the patches.
+
 ```json
 {
     "name": "netresearch/patched-typo3",
@@ -108,6 +109,39 @@ just require the package with the patches. If you don't want a patch package out
     "require": {
         "netresearch/typo3-patches": "~1.0",
         "typo3/cms": "6.2.0-beta3"
+    }
+}
+```
+
+If you don't want a patch package outside the root package, consider providing it as package in the [repositories key](https://getcomposer.org/doc/04-schema.md#repositories)
+
+```json
+{
+    "name": "vendor/package",
+    "type": "project",
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "vendor/package-patches",
+                "version": "1.0.0",
+                "type": "patches",
+                "extra": {
+                    "patches": {
+                        "vendor/name": {
+                            "1.2.3": [
+                                {
+                                    "url": "https://my-domain.com/path/to/my.patch"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "require": {
+        "vendor/package-patches": "~1.0"
     }
 }
 ```
