@@ -20,6 +20,7 @@ namespace Netresearch\Composer\Patches;
  * @property-read string $type Type of the patch
  * @property-read string $url URL to the patch
  * @property-read string $title Title of the patch
+ * @property-read string $args Patch command additional arguments
  *
  * @author Christian Opitz <christian.opitz at netresearch.de>
  */
@@ -211,6 +212,9 @@ class Patch {
 		$command = 'patch -f -p1 --no-backup-if-mismatch -r -';
 		if ($revert) {
 			$command .= ' -R';
+		}
+		if (isset($this->info->args)) {
+			$command .= ' ' . $this->info->args;
 		}
 		if ($dryRun) {
 			$command .= ' --dry-run';
