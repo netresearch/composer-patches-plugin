@@ -258,8 +258,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 		if ($action == 'test' && !$this->io->isVeryVerbose()) {
 			return;
 		}
+		if ($action == 'revert' && !$this->io->isVerbose()) {
+			return;
+		}
 		$msg = '  - ' . ucfirst($action) . 'ing patch';
-		if ($this->io->isVerbose()) {
+		if ($this->io->isVerbose() || !isset($patch->title)) {
 			$msg .= ' <info>' . $patch->getChecksum() . '</info>';
 		}
 		$msg .=	' ' . $adverbMap[$action];
