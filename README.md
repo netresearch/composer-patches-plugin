@@ -14,7 +14,7 @@ composer.json:
 {
     "name": "netresearch/typo3-patches",
     "version": "1.0.0",
-    "type": "patches",
+    "type": "metapackage",
     "require": {
         "netresearch/composer-patches-plugin": "~1.0"
     },
@@ -57,7 +57,7 @@ composer.json:
     {
         "name": "netresearch/typo3-patches",
         "version": "1.0.0",
-        "type": "patches",
+        "type": "metapackage",
         "require": {
             "netresearch/composer-patches-plugin": "~1.0"
         },
@@ -125,7 +125,7 @@ If you don't want a patch package outside the root package, consider providing i
             "package": {
                 "name": "vendor/package-patches",
                 "version": "1.0.0",
-                "type": "patches",
+                "type": "metapackage",
                 "extra": {
                     "patches": {
                         "vendor/name": {
