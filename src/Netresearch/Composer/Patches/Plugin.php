@@ -175,6 +175,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 		$history = array();
 		$appliedPatches = array();
 
+		if ($this->packagesToPatch) {
+			$this->io->write('<info>Applying patches:</info>');
+		}
+
 		foreach ($this->packagesToPatch as $initialPackage) {
 			foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
 				list($patches, $package) = $patchesAndPackage;
@@ -256,9 +260,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 	protected function writePatchNotice($action, Patch $patch, PackageInterface $package) {
 		$adverbMap = array('test' => 'on', 'apply' => 'to', 'revert' => 'from');
 		if ($action == 'test' && !$this->io->isVeryVerbose()) {
-			return;
-		}
-		if ($action == 'revert' && !$this->io->isVerbose()) {
 			return;
 		}
 		$msg = '  - ' . ucfirst($action) . 'ing patch';
