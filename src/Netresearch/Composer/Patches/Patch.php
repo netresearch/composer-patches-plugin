@@ -72,6 +72,9 @@ class Patch {
 		$this->info = $info;
 		$this->patchSet = $patchSet;
 		$this->checksum = sha1($this->read());
+		if (isset($this->info->sha1) && !$this->info->sha1 !== $this->checksum) {
+			throw new Exception("Expected checksum '{$this->info->sha1}' but got '{$this->checksum}'");
+		}
 	}
 
 	/**
