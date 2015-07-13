@@ -81,7 +81,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 		$this->downloader = new Downloader\Composer($io);
 
 		// Add the installer
-		$noopInstaller = new Installer();
+		$noopInstaller = new Installer($io);
 		$composer->getInstallationManager()->addInstaller($noopInstaller);
 	}
 
