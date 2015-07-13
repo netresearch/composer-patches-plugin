@@ -12,6 +12,8 @@ namespace Netresearch\Composer\Patches;
  *                                                                        *
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
+use Composer\Package\LinkConstraint\VersionConstraint;
+use Composer\Package\Version\VersionParser;
 
 /**
  * Model, representing a patchSet
@@ -72,6 +74,11 @@ class PatchSet {
 	/**
 	 * Get the patches for a package, identified by name and version
 	 *
+	 * @param string $name
+	 * @param string $version
+	 *
+	 * @throws Exception
+	 *
 	 * @return Patch[]
 	 */
 	public function getPatches($name, $version) {
@@ -80,23 +87,48 @@ class PatchSet {
 			$this->patches = array();
 		}
 		if (!array_key_exists($name, $this->patches)) {
-			$vInfo = array();
-			$formatter = new \Composer\Package\Version\VersionParser();
-			foreach ($this->read($this->source, $name) as $v => $info) {
-				$vInfo[$formatter->normalize($v)] = $info;
-			}
-			$this->source[$name] = $vInfo;
+			$this->source[$name] = $this->read($this->source, $name);
 			$this->patches[$name] = array();
 		}
 		if (!array_key_exists($version, $this->patches[$name])) {
-			$patchInfos = $this->read($this->source[$name], $version);
-			$patches = array();
-			foreach ($patchInfos as $id => $info) {
-				$info = $this->read($info);
-				if (!isset($info['id'])) {
-					$info['id'] = $id;
+			$patchInfos = $this->read($this->source[$name]);
+			if ($this->isPatch($patchInfos)) {
+				$rawPatches = array($patchInfos);
+			} else {
+				$rawPatches = array();
+				$hasConstraints = null;
+				$requiredConstraint = new VersionConstraint('==', $version);
+				$versionParser = new VersionParser();
+				foreach ($patchInfos as $constraint => $patchInfo) {
+					if ($this->isPatch($patchInfo)) {
+						$isConstraint = false;
+						$rawPatches[] = $patchInfo;
+					} else {
+						$patchInfo = $this->read($patchInfo);
+						$isConstraint = true;
+						$constraint = $versionParser->parseConstraints($constraint);
+						if ($constraint->matches($requiredConstraint)) {
+							foreach ($patchInfo as $i => $rawPatch) {
+								if (!$this->isPatch($rawPatch)) {
+									throw new Exception("Entry {$name}.{$constraint}[{$i}] is not a valid patch");
+								}
+								$rawPatches[] = $rawPatch;
+							}
+						}
+					}
+					if ($hasConstraints !== null) {
+						if ($hasConstraints !== $isConstraint) {
+							throw new Exception('Mixing patches with constraints and without constraints is not possible');
+						}
+					} else {
+						$hasConstraints = $isConstraint;
+					}
 				}
-				$patches[] = new Patch((object) $info, $this);
+			}
+			$patches = array();
+			foreach ($rawPatches as $rawPatch) {
+				$patch = new Patch((object) $rawPatch, $this);
+				$patches[$patch->getChecksum()] = $patch;
 			}
 			$this->patches[$name][$version] = $patches;
 		}
@@ -104,9 +136,21 @@ class PatchSet {
 	}
 
 	/**
+	 * Determine if this config is a patches config
+	 *
+	 * @param array $config
+	 *
+	 * @return bool
+	 */
+	protected function isPatch($config)
+	{
+		return is_array($config) && array_key_exists('url', $config);
+	}
+
+	/**
 	 * Read in the JSON file
 	 *
-	 * @return string
+	 * @return array|string
 	 * @throws Exception
 	 */
 	protected function read($data, $key = NULL) {
