@@ -61,6 +61,8 @@ class Patch {
 	 */
 	protected $patchSet;
 
+	protected $checksum;
+
 	/**
 	 * Construct with $info from {@see PatchSet::process()}
 	 *
@@ -69,6 +71,15 @@ class Patch {
 	public function __construct(\stdClass $info, PatchSet $patchSet) {
 		$this->info = $info;
 		$this->patchSet = $patchSet;
+		$this->checksum = sha1($this->read());
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getChecksum()
+	{
+		return $this->checksum;
 	}
 
 	/**

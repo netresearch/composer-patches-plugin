@@ -263,7 +263,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 		}
 		$msg = '  - ' . ucfirst($action) . 'ing patch';
 		if ($this->io->isVerbose()) {
-			$msg .= ' <info>' . $patch->id . '</info>';
+			$msg .= ' <info>' . $patch->getChecksum() . '</info>';
 		}
 		$msg .=	' ' . $adverbMap[$action];
 		$msg .=	' <info>' . $package->getName() . '</info>';

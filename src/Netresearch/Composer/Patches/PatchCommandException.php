@@ -25,7 +25,7 @@ class PatchCommandException extends Exception {
 	 * @param array $output
 	 */
 	public function __construct($command, $output, Patch $patch, $dryRun = FALSE) {
-		$output = 'Patch ' . $patch->id . ' ' . ($dryRun ? 'would fail' : 'failed') . "!\n" .
+		$output = 'Patch ' . $patch->getChecksum() . ' ' . ($dryRun ? 'would fail' : 'failed') . "!\n" .
 			'Error executing command "' . $command . '":' . "\n" .
 			(is_array($output) ? implode("\n", $output) : $output);
 		parent::__construct($output);
