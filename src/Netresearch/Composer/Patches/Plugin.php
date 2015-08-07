@@ -184,8 +184,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 			foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
 				list($patches, $package) = $patchesAndPackage;
                                 $packagePath = $this->getPackagePath($package);
-                                var_dump($packagePath, $patches, $package);
-				foreach ($patches as $patch) {
+                                $this->io->write('<info>PATCH: package_path='.$packagePath."\n\n</info>\n\n");
+                                foreach ($patches as $patch) {
+                                      $this->io->write('<info>PATCH::'.print_r($patch,1)."\n\n</info>\n\n");
 					$this->writePatchNotice('test', $patch, $package);
 					if (!$patch->test($packagePath)) {
 						$this->io->write('  <warning>Failing patch detected - reverting already applied patches</warning>');
