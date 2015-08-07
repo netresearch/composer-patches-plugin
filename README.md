@@ -1,4 +1,3 @@
-# Rednut Clone
 # composer-patches-plugin
 
 This plugin allows you to provide patches for any package from any package.
