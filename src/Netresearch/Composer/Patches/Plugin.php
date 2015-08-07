@@ -175,14 +175,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 		$history = array();
 		$appliedPatches = array();
 
-		if ($this->packagesToPatch) {
+                if ($this->packagesToPatch) {
+                  
 			$this->io->write('<info>Applying patches:</info>');
 		}
 
 		foreach ($this->packagesToPatch as $initialPackage) {
 			foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
 				list($patches, $package) = $patchesAndPackage;
-				$packagePath = $this->getPackagePath($package);
+                                $packagePath = $this->getPackagePath($package);
+                                var_dump($packagePath, $patches, $package);
 				foreach ($patches as $patch) {
 					$this->writePatchNotice('test', $patch, $package);
 					if (!$patch->test($packagePath)) {
