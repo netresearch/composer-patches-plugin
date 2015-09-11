@@ -59,7 +59,7 @@ class Composer implements DownloaderInterface {
 		if (array_key_exists($url, $this->cache)) {
 			return $this->cache[$url];
 		}
-		return $this->cache[$url] = $this->remoteFileSystem->getContents($this->getOriginUrl($url), $url);
+		return $this->cache[$url] = $this->remoteFileSystem->getContents($this->getOriginUrl($url), $url, false);
 	}
 
 	/**

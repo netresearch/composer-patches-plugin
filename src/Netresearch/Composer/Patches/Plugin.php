@@ -14,14 +14,15 @@ namespace Netresearch\Composer\Patches;
  *                                                                        */
 
 use Composer\Composer;
+use Composer\Downloader\DownloaderInterface;
+use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 
 use Composer\Script\Event;
-use Composer\Script\PackageEvent;
+use Composer\Installer\PackageEvent;
 use Composer\Script\ScriptEvents;
 use Composer\EventDispatcher\EventSubscriberInterface;
-use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\Package\PackageInterface;
@@ -32,14 +33,8 @@ use Composer\Package\PackageInterface;
  *
  * @author Christian Opitz <christian.opitz at netresearch.de>
  */
-class Plugin implements PluginInterface, EventSubscriberInterface {
-	/**
-	 * The name of this package
-	 * @todo Eventually retrieve this from the composer.json of this package
-	 */
-	const SELF_PACKAGE_NAME = 'netresearch/composer-patches-plugin';
-
-
+class Plugin implements PluginInterface, EventSubscriberInterface
+{
 	/**
 	 * @var IOInterface
 	 */
@@ -51,21 +46,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 	protected $composer;
 
 	/**
-	 * Restored packages are registered here in order to not doubly restore 'em
-	 * @var array
-	 */
-	protected $restoredPackages = array();
-
-	/**
-	 * The packages that should be patched (collected on update/install and
-	 * patched after all packages are updated/installed)
-	 * @var array
-	 */
-	protected $packagesToPatch = array();
-
-	/**
 	 *
-	 * @var Downloader\Interface
+	 * @var DownloaderInterface
 	 */
 	protected $downloader;
 
@@ -89,55 +71,49 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 	 * Get the events, this {@see \Composer\EventDispatcher\EventSubscriberInterface}
 	 * subscribes to
 	 *
-	 * Returns the events only once (on consecutive calls this will return an empty
-	 * array) as composer creates a copy of the current class, when it already exists
-	 * which happens after an update of the patchSet package
-	 * @see \Composer\Plugin\PluginManager::registerPackage()
-	 *
 	 * @return array
 	 */
 	public static function getSubscribedEvents() {
-		// Composer creates a copy of the current class, when it already exists
-		// This happens after an update of the patchSet package
-		// @see \Composer\Plugin\PluginManager::registerPackage()
-		$key = 'T3eeComposerPatchSetPlugin';
-		if (isset($GLOBALS[$key])) {
-			return array();
-		}
-		$GLOBALS[$key] = 1;
-
 		return array(
-			ScriptEvents::PRE_PACKAGE_UNINSTALL => array('restore'),
-			ScriptEvents::PRE_PACKAGE_UPDATE => array('restore'),
-			ScriptEvents::POST_PACKAGE_UPDATE => array('collect'),
-			ScriptEvents::POST_PACKAGE_INSTALL => array('collect'),
+			PackageEvents::PRE_PACKAGE_UNINSTALL => array('restore'),
+			PackageEvents::PRE_PACKAGE_UPDATE => array('restore'),
 			ScriptEvents::POST_UPDATE_CMD => array('apply'),
-			ScriptEvents::POST_INSTALL_CMD => array('apply')
+			ScriptEvents::POST_INSTALL_CMD => array('apply'),
 		);
 	}
 
 	/**
-	 * Event handler for preUpdate/preUninstall events: Revert the patches
+	 * Revert patches on/from packages that are going to be removed
 	 *
-	 * @param \Composer\Script\PackageEvent $event
+	 * @param PackageEvent $event
 	 * @throws Exception
+	 *
+	 * @return void
 	 */
-	public function restore(PackageEvent $event) {
+	public function restore(PackageEvent $event)
+	{
 		$operation = $event->getOperation();
-
-		if ($operation instanceof UninstallOperation) {
-			$initialPackage = $operation->getPackage();
-		} elseif ($operation instanceof UpdateOperation) {
+		if ($operation instanceof UpdateOperation) {
 			$initialPackage = $operation->getInitialPackage();
+		} elseif ($operation instanceof UninstallOperation) {
+			$initialPackage = $operation->getPackage();
 		} else {
-			throw new Exception('Unknown operation ' . get_class($operation));
+			throw new Exception('Unexpected operation ' . get_class($operation));
 		}
 
-		foreach ($this->getPatches($initialPackage, $this->restoredPackages) as $patchesAndPackage) {
+		static $history = array();
+
+		foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
 			list($patches, $package) = $patchesAndPackage;
 			$packagePath = $this->getPackagePath($package);
 			foreach (array_reverse($patches) as $patch) {
 				/* @var $patch Patch */
+				try {
+					$patch->revert($packagePath, true);
+				} catch (PatchCommandException $e) {
+					$this->writePatchNotice('revert', $patch, $package, $e);
+					continue;
+				}
 				$this->writePatchNotice('revert', $patch, $package);
 				$patch->revert($packagePath);
 			}
@@ -145,58 +121,37 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 	}
 
 	/**
-	 * Event handler to the postUpdate/postInstall events: Collect the packages
-	 * as potential canditates for patching
-	 *
-	 * @param \Composer\Script\PackageEvent $event
-	 * @throws Exception
-	 */
-	public function collect(PackageEvent $event) {
-		$operation = $event->getOperation();
-		if ($operation instanceof InstallOperation) {
-			$package = $operation->getPackage();
-		} elseif ($operation instanceof UpdateOperation) {
-			$package = $operation->getTargetPackage();
-		} else {
-			throw new Exception('Unknown operation ' . get_class($operation));
-		}
-
-		$this->packagesToPatch[$package->getName()] = $package;
-	}
-
-	/**
-	 * Event handler to the postUpdateCmd/postInstallCmd events: Look for patches
-	 * for the patch candidate packages and apply them when available
+	 * Event handler to the postUpdateCmd/postInstallCmd events: Loop through all
+	 * installed packages and apply patches for them.
 	 *
 	 * @param \Composer\Script\Event $event
-	 * @param Downloader\DownloaderInterface|NULL $downloader
 	 */
 	public function apply(Event $event) {
-		$history = array();
-		$appliedPatches = array();
+		static $history = array();
 
-		if ($this->packagesToPatch) {
-			$this->io->write('<info>Applying patches:</info>');
-		}
+		$this->io->write('<info>Maintaining patches</info>');
 
-		foreach ($this->packagesToPatch as $initialPackage) {
+		foreach ($event->getComposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $initialPackage) {
 			foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
+				/* @var $patches Patch[] */
 				list($patches, $package) = $patchesAndPackage;
 				$packagePath = $this->getPackagePath($package);
 				foreach ($patches as $patch) {
 					$this->writePatchNotice('test', $patch, $package);
-					if (!$patch->test($packagePath)) {
-						$this->io->write('  <warning>Failing patch detected - reverting already applied patches</warning>');
-						foreach (array_reverse($appliedPatches) as $patchPackageAndPath) {
-							list($revertPatch, $revertPackage, $revertPath) = $patchPackageAndPath;
-							$this->writePatchNotice('revert', $revertPatch, $revertPackage);
-							$revertPatch->revert($revertPath);
+					try {
+						$patch->apply($packagePath, true);
+					} catch (PatchCommandException $applyException) {
+						try {
+							// If this won't fail, patch was already applied
+							$patch->revert($packagePath, true);
+						} catch (PatchCommandException $revertException) {
+							// Patch seems not to be applied and fails as well
+							$this->writePatchNotice('apply', $patch, $package, $applyException);
 						}
-						throw $patch->getException();
+						continue;
 					}
 					$this->writePatchNotice('apply', $patch, $package);
 					$patch->apply($packagePath);
-					$appliedPatches[] = array($patch, $package, $packagePath);
 				}
 			}
 		}
@@ -256,13 +211,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 	 * @param string $action
 	 * @param \Netresearch\Composer\Patches\Patch $patch
 	 * @param \Composer\Package\PackageInterface $package
+	 * @param \Netresearch\Composer\Patches\Exception $exception
 	 */
-	protected function writePatchNotice($action, Patch $patch, PackageInterface $package) {
+	protected function writePatchNotice($action, Patch $patch, PackageInterface $package, $exception = null) {
 		$adverbMap = array('test' => 'on', 'apply' => 'to', 'revert' => 'from');
 		if ($action == 'test' && !$this->io->isVeryVerbose()) {
 			return;
 		}
-		$msg = '  - ' . ucfirst($action) . 'ing patch';
+		$msg = '  ' . ucfirst($action) . 'ing patch';
 		if ($this->io->isVerbose() || !isset($patch->title)) {
 			$msg .= ' <info>' . $patch->getChecksum() . '</info>';
 		}
@@ -275,6 +231,15 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 			$msg .= ': <comment>' . $patch->title . '</comment>';
 		}
 		$this->io->write($msg);
+		if ($exception) {
+			$this->io->write(
+				'  <warning>Could not ' . $action . ' patch</warning>' .
+				($action == 'revert' ? ' (was probably not applied)' : '')
+			);
+			if ($this->io->isVerbose()) {
+				$this->io->write('<warning>' . $exception->getMessage() . '</warning>');
+			}
+		}
 	}
 }
 ?>

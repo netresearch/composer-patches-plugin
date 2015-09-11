@@ -51,12 +51,6 @@ class Patch {
 	protected $fileAdditions;
 
 	/**
-	 * The exception catched by test()
-	 * @var Exception
-	 */
-	protected $exception;
-
-	/**
 	 * @var PatchSet
 	 */
 	protected $patchSet;
@@ -173,45 +167,22 @@ class Patch {
 	 * Apply the patch
 	 *
 	 * @param string $toPath
+	 * @param boolean $dryRun
 	 * @throws Exception
 	 * @throws PatchCommandException
 	 */
-	public function apply($toPath) {
-		$this->runCommand($toPath);
-	}
-
-	/**
-	 * Check, if the patch would cause errors
-	 *
-	 * @param string $toPath
-	 * @return boolean
-	 */
-	public function test($toPath) {
-		try {
-			$this->runCommand($toPath, FALSE, TRUE);
-		} catch (PatchCommandException $e) {
-			$this->exception = $e;
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-	/**
-	 * Get the exception, catched by test()
-	 *
-	 * @return PatchCommandException
-	 */
-	public function getException() {
-		return $this->exception;
+	public function apply($toPath, $dryRun = FALSE) {
+		$this->runCommand($toPath, FALSE, $dryRun);
 	}
 
 	/**
 	 * Revert the patch
-	 * 
+	 *
 	 * @param string $toPath
+	 * @param boolean $dryRun
 	 */
-	public function revert($toPath) {
-		$this->runCommand($toPath, TRUE);
+	public function revert($toPath, $dryRun = FALSE) {
+		$this->runCommand($toPath, TRUE, $dryRun);
 	}
 
 	/**
