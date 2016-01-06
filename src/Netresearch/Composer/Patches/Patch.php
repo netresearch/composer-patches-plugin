@@ -185,19 +185,24 @@ class Patch {
 		$this->runCommand($toPath, TRUE, $dryRun);
 	}
 
-        /**
-         * Locate the patch executable
-         *
-         * @throws Exception
-         */
-        protected function whichPatchCmd () {
-                $exit_code = $output = null;
-                $patch_command = exec('which patch', $output, $exit_code);
-                if ( 0 !== $exit_code || ! is_executable ($patch_command) ) {
-                          throw new Exception("Cannot find the 'patch' executable command - use your o/s package manager like 'sudo yum install patch'");                  
-                }
-                return $patch_command;
-        }
+	/**
+	 * Locate the patch executable
+	 *
+	 * @throws Exception
+	 *
+	 * @return string
+	 */
+	protected function whichPatchCmd () {
+		static $patchCommand = null;
+		if (!$patchCommand) {
+			$exitCode = $output = null;
+			$patchCommand = exec('which patch', $output, $exitCode);
+			if (0 !== $exitCode || !is_executable($patchCommand)) {
+				throw new Exception("Cannot find the 'patch' executable command - use your o/s package manager like 'sudo yum install patch'");
+			}
+		}
+		return $patchCommand;
+	}
 
 	/**
 	 * Run the patch command
@@ -207,11 +212,8 @@ class Patch {
 	 * @param boolean $dryRun
 	 * @throws PatchCommandException
 	 */
-        protected function runCommand($toPath, $revert = FALSE, $dryRun = FALSE) {
-
-                // locate path to patch.. if it exists
-		$command = $this->whichPatchCmd() .
-                           ' -f -p1 --no-backup-if-mismatch -r -';
+	protected function runCommand($toPath, $revert = FALSE, $dryRun = FALSE) {
+		$command = $this->whichPatchCmd() . ' -f -p1 --no-backup-if-mismatch -r -';
 
 		if ($revert) {
 			$command .= ' -R';
