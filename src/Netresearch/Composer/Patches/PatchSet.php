@@ -12,7 +12,7 @@ namespace Netresearch\Composer\Patches;
  *                                                                        *
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
-use Composer\Package\LinkConstraint\VersionConstraint;
+
 use Composer\Package\Version\VersionParser;
 
 /**
@@ -97,7 +97,12 @@ class PatchSet {
 			} else {
 				$rawPatches = array();
 				$hasConstraints = null;
-				$requiredConstraint = new VersionConstraint('==', $version);
+				if (class_exists('Composer\Semver\Constraint\Constraint')) {
+					$constraintClass = 'Composer\Semver\Constraint\Constraint';
+				} else {
+					$constraintClass = 'Composer\Package\LinkConstraint\VersionConstraint';
+				}
+				$requiredConstraint = new $constraintClass('==', $version);
 				$versionParser = new VersionParser();
 				foreach ($patchInfos as $constraint => $patchInfo) {
 					if ($this->isPatch($patchInfo)) {
