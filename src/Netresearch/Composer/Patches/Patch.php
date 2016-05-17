@@ -228,6 +228,9 @@ class Patch {
 		if ($this->executeProcess($command, $toPath, $this->read(), $stdout) > 0) {
 			throw new PatchCommandException($command, $stdout, $this, $dryRun);
 		}
+		elseif (!$this->offsetWithinBounds($stdout)) {
+			throw new PatchCommandException($command, 'Maximum offset exceeded', $this, $dryRun);
+		}
 	}
 
 	/**
@@ -314,5 +317,27 @@ class Patch {
 		}
 
 		return proc_close($process);
+	}
+
+	/**
+	 * @param $stdout
+	 * @throws \Netresearch\Composer\Patches\PatchCommandException
+	 */
+	protected function offsetWithinBounds($stdout) {
+		// We don't have to check for a maximum offset if it is not specified.
+		if (!isset($this->info->maximum_offset)) {
+			return TRUE;
+		}
+
+		$pattern = '/offset (\d+) lines/i';
+		if (preg_match_all($pattern, $stdout, $matches)) {
+			foreach ($matches[1] as $match) {
+				if ($match > $this->info->maximum_offset) {
+					return FALSE;
+				}
+			}
+		}
+
+		return TRUE;
 	}
 }
