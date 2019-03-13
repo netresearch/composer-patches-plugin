@@ -50,19 +50,35 @@ class Composer implements DownloaderInterface {
 	}
 
 	/**
+	 * Translate 
+	 * @param type $url
+	 */
+	protected function resolveVendorPath($url) {
+	    // Alternative vendor path defined and patch file starts with `vendor/`
+	    if(getenv('COMPOSER_VENDOR_DIR') && strpos($url, 'vendor/') === 0) {
+		return getenv('COMPOSER_VENDOR_DIR') . DIRECTORY_SEPARATOR . \mb_substr($url, mb_strlen('vendor/'));
+	    }
+	    
+	    return $url;
+	}
+
+	/**
 	 * Download the file and return its contents
 	 * 
 	 * @param string $url The URL from where to download
 	 * @return string Contents of the URL
 	 */
 	public function getContents($url) {
-		if (array_key_exists($url, $this->cache)) {
-			return $this->cache[$url];
-		}
-		return $this->cache[$url] = $this->remoteFileSystem->getContents($this->getOriginUrl($url), $url, false);
+	    if (array_key_exists($url, $this->cache)) {
+		return $this->cache[$url];
+	    }
+	    
+	    $path = $this->resolveVendorPath($url);
+	    
+	    return $this->cache[$url] = $this->remoteFileSystem->getContents($this->getOriginUrl($url), $path, false);
 	}
 
-	/**
+    /**
 	 * Download file and decode the JSON string to PHP object
 	 *
 	 * @param string $json
