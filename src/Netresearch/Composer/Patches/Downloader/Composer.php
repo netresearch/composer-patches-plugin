@@ -25,12 +25,6 @@ class Composer implements DownloaderInterface {
 	protected $remoteFileSystem;
 
 	/**
-	 * Very simple cache system
-	 * @var array
-	 */
-	protected $cache = array();
-
-	/**
 	 * Construct the RFS
 	 * 
 	 * @param \Composer\IO\IOInterface $io
@@ -56,10 +50,7 @@ class Composer implements DownloaderInterface {
 	 * @return string Contents of the URL
 	 */
 	public function getContents($url) {
-		if (array_key_exists($url, $this->cache)) {
-			return $this->cache[$url];
-		}
-		return $this->cache[$url] = $this->remoteFileSystem->getContents($this->getOriginUrl($url), $url, false);
+		return $this->remoteFileSystem->getContents($this->getOriginUrl($url), $url, false);
 	}
 
 	/**
@@ -69,12 +60,8 @@ class Composer implements DownloaderInterface {
 	 * @return stdClass
 	 */
 	public function getJson($url) {
-		$key = 'json://' . $url;
-		if (array_key_exists($key, $this->cache)) {
-			return $this->cache[$key];
-		}
 		$json = new \Composer\Json\JsonFile($url, $this->remoteFileSystem);
-		return $this->cache[$key] = $json->read();
+		return $json->read();
 	}
 }
 ?>
