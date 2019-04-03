@@ -25,12 +25,6 @@ class Composer implements DownloaderInterface {
 	protected $remoteFileSystem;
 
 	/**
-	 * Very simple cache system
-	 * @var array
-	 */
-	protected $cache = array();
-
-	/**
 	 * Construct the RFS
 	 * 
 	 * @param \Composer\IO\IOInterface $io
@@ -50,31 +44,38 @@ class Composer implements DownloaderInterface {
 	}
 
 	/**
+	 * Translate 
+	 * @param type $url
+	 */
+	protected function resolveVendorPath($url) {
+	    // Alternative vendor path defined and patch file starts with `vendor/`
+	    if(getenv('COMPOSER_VENDOR_DIR') && strpos($url, 'vendor/') === 0) {
+		return getenv('COMPOSER_VENDOR_DIR') . DIRECTORY_SEPARATOR . \mb_substr($url, mb_strlen('vendor/'));
+	    }
+	    
+	    return $url;
+	}
+
+	/**
 	 * Download the file and return its contents
 	 * 
 	 * @param string $url The URL from where to download
 	 * @return string Contents of the URL
 	 */
 	public function getContents($url) {
-		if (array_key_exists($url, $this->cache)) {
-			return $this->cache[$url];
-		}
-		return $this->cache[$url] = $this->remoteFileSystem->getContents($this->getOriginUrl($url), $url, false);
+	    $path = $this->resolveVendorPath($url);
+		  return $this->cache[$url] = $this->remoteFileSystem->getContents($this->getOriginUrl($url), $path, false);
 	}
 
-	/**
+    /**
 	 * Download file and decode the JSON string to PHP object
 	 *
 	 * @param string $json
 	 * @return stdClass
 	 */
 	public function getJson($url) {
-		$key = 'json://' . $url;
-		if (array_key_exists($key, $this->cache)) {
-			return $this->cache[$key];
-		}
 		$json = new \Composer\Json\JsonFile($url, $this->remoteFileSystem);
-		return $this->cache[$key] = $json->read();
+		return $json->read();
 	}
 }
 ?>
