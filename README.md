@@ -38,6 +38,13 @@ If you don't want a patch package outside the root package, consider providing i
 
 See this presentation for the original idea of this plugin: http://de.slideshare.net/christianopitz/distributed-patching-with-composer
 
+## Test you patches
+The _composer-patches-plugin_ provides post-install and post-update scripts. With that knowledge you can apply your patches without
+updating your dependencies like so:
+```bash
+composer run-script post-update-cmd -- --check
+``` 
+
 ## Patch properties
 
 Key | Description | Required
