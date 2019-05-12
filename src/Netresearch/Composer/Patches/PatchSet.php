@@ -37,6 +37,11 @@ class PatchSet {
 	 */
 	protected $downloader;
 
+    /**
+     * @var bool
+     */
+	protected $throwOnFailure;
+
 	/**
 	 * Contains the data downloaded from the URLs
 	 * @var array
@@ -48,10 +53,12 @@ class PatchSet {
 	 *
 	 * @param array|object|string $source
 	 * @param Downloader\DownloaderInterface $downloader
+     * @param bool $throwOnFailure
 	 */
-	public function __construct($source, Downloader\DownloaderInterface $downloader) {
+	public function __construct($source, Downloader\DownloaderInterface $downloader, $throwOnFailure = false) {
 		$this->source = $source;
 		$this->setDownloader($downloader);
+		$this->throwOnFailure = $throwOnFailure;
 	}
 
 	/**

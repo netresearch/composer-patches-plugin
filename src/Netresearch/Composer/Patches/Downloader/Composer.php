@@ -24,6 +24,11 @@ class Composer implements DownloaderInterface {
 	 */
 	protected $remoteFileSystem;
 
+    /**
+     * @var array
+     */
+	protected $downloaderCache;
+
 	/**
 	 * Construct the RFS
 	 * 
@@ -31,6 +36,7 @@ class Composer implements DownloaderInterface {
 	 */
 	public function __construct(\Composer\IO\IOInterface $io) {
 		$this->remoteFileSystem = new RemoteFilesystem($io);
+		$this->downloaderCache = array();
 	}
 
 	/**
@@ -57,11 +63,51 @@ class Composer implements DownloaderInterface {
 	 * Download file and decode the JSON string to PHP object
 	 *
 	 * @param string $json
-	 * @return stdClass
+	 * @return array|stdClass
 	 */
 	public function getJson($url) {
+	    if (($cached = $this->fromCache($url)) !== null) {
+	        return $cached;
+        }
+
 		$json = new \Composer\Json\JsonFile($url, $this->remoteFileSystem);
-		return $json->read();
+	    $data = $json->read();
+		$this->toCache($url, $data);
+		return $data;
+	}
+
+    /**
+     * @param string $url
+     * @return mixed|null
+     */
+    protected function fromCache($url)
+    {
+        $cacheKey = $this->getCacheKey($url);
+
+        if (array_key_exists($cacheKey, $this->downloaderCache)) {
+            return $this->downloaderCache[$cacheKey];
+        }
+
+        return null;
+	}
+
+    /**
+     * @param string $url
+     * @param mixed $json
+     * @return void
+     */
+    protected function toCache($url, $json)
+    {
+        $this->downloaderCache[$this->getCacheKey($url)] = $json;
+	}
+
+    /**
+     * @param string $url
+     * @return string
+     */
+    protected function getCacheKey($url)
+    {
+        return hash("md5", $url);
 	}
 }
 ?>

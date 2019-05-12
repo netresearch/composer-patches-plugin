@@ -134,7 +134,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		foreach ($event->getComposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $initialPackage) {
 			foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
 				/* @var $patches Patch[] */
-				list($patches, $package) = $patchesAndPackage;
+				list($patches, $package, $throwOnFailure) = $patchesAndPackage;
 				$packagePath = $this->getPackagePath($package);
 				foreach ($patches as $patch) {
 					$this->writePatchNotice('test', $patch, $package);
@@ -147,6 +147,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 						} catch (PatchCommandException $revertException) {
 							// Patch seems not to be applied and fails as well
 							$this->writePatchNotice('apply', $patch, $package, $applyException);
+							if ($throwOnFailure) {
+							    throw new \Netresearch\Composer\Patches\Exception(
+							        sprintf("Unable to apply patch to %s", $package->getName())
+                                );
+                            }
 						}
 						continue;
 					}
@@ -155,6 +160,30 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 				}
 			}
 		}
+	}
+
+    /**
+     * Append patches to the internal patch list
+     *
+     * @param \Composer\Package\PackageInterface $package
+     * @param array $patchSet
+     * @param array $patches
+     * @param array $packages
+     * @return array
+     */
+    protected function addPatches($package, $patchSets, $extra, $packages)
+    {
+        $patchSets[$package->getName()] = array(
+            $extra['patches'],
+            $packages,
+            array_key_exists('throw-on-patch-failure', $extra) && ($extra['throw-on-patch-failure'] === true)
+        );
+        $this->io->write(
+            sprintf("<comment>Found patches in</comment> %s", $package->getName()),
+            true,
+            \Composer\IO\IOInterface::VERY_VERBOSE
+        );
+        return $patchSets;
 	}
 
 	/**
@@ -170,23 +199,24 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 		foreach ($packages as $package) {
 			$extra = $package->getExtra();
 			if (isset($extra['patches']) && $initialPackage->getName() != $package->getName()) {
-				$patchSets[$package->getName()] = array($extra['patches'], array($initialPackage));
+			    $patchSets = $this->addPatches($package, $patchSets, $extra, array($initialPackage));
 			}
 		}
 
 		$extra = $initialPackage->getExtra();
 		if (isset($extra['patches'])) {
-			$patchSets[$initialPackage->getName()] = array($extra['patches'], $packages);
+			$patchSets = $this->addPatches($initialPackage, $patchSets, $extra, $packages);
 		}
 
 		$patchesAndPackages = array();
 		foreach ($patchSets as $sourceName => $patchConfAndPackages) {
-			$patchSet = new PatchSet($patchConfAndPackages[0], $this->downloader);
-			foreach ($patchConfAndPackages[1] as $package) {
+		    list($patches, $packages, $throwOnFailure) = $patchConfAndPackages;
+			$patchSet = new PatchSet($patches, $this->downloader);
+			foreach ($packages as $package) {
 				$id = $sourceName . '->' . $package->getName();
-				$patches = $patchSet->getPatches($package->getName(), $package->getVersion());
+				$patches = $patchSet->getPatches($package->getName(), $package->getVersion(), $throwOnFailure);
 				if (!array_key_exists($id, $history) && count($patches)) {
-					$patchesAndPackages[$id] = array($patches, $package);
+					$patchesAndPackages[$id] = array($patches, $package, $throwOnFailure);
 					$history[$id] = TRUE;
 				}
 			}
