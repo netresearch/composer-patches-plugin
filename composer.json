@@ -1,6 +1,5 @@
 {
     "name": "netresearch/composer-patches-plugin",
-    "version": "2.0.0",
     "type": "composer-plugin",
     "license": "GPL-2.0",
     "description": "Composer patches plugin",
