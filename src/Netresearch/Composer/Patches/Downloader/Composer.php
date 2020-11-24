@@ -18,50 +18,55 @@ use Composer\Util\RemoteFilesystem;
 /**
  * Downloader, which uses the composer RemoteFilesystem
  */
-class Composer implements DownloaderInterface {
-	/**
-	 * @var RemoteFilesystem 
-	 */
-	protected $remoteFileSystem;
+class Composer implements DownloaderInterface
+{
+    /**
+     * @var RemoteFilesystem 
+     */
+    protected $remoteFileSystem;
 
-	/**
-	 * Construct the RFS
-	 * 
-	 * @param \Composer\IO\IOInterface $io
-	 */
-	public function __construct(\Composer\IO\IOInterface $io) {
-		$this->remoteFileSystem = new RemoteFilesystem($io);
-	}
+    /**
+     * Construct the RFS
+     * 
+     * @param \Composer\IO\IOInterface $io
+     */
+    public function __construct(\Composer\IO\IOInterface $io)
+    {
+        $this->remoteFileSystem = new RemoteFilesystem($io);
+    }
 
-	/**
-	 * Get the origin URL required by composer rfs
-	 * 
-	 * @param string $url
-	 * @return string
-	 */
-	protected function getOriginUrl($url) {
-		return parse_url($url, PHP_URL_HOST);
-	}
+    /**
+     * Get the origin URL required by composer rfs
+     * 
+     * @param  string $url
+     * @return string
+     */
+    protected function getOriginUrl($url)
+    {
+        return parse_url($url, PHP_URL_HOST);
+    }
 
-	/**
-	 * Download the file and return its contents
-	 * 
-	 * @param string $url The URL from where to download
-	 * @return string Contents of the URL
-	 */
-	public function getContents($url) {
-		return $this->remoteFileSystem->getContents($this->getOriginUrl($url), $url, false);
-	}
+    /**
+     * Download the file and return its contents
+     * 
+     * @param  string $url The URL from where to download
+     * @return string Contents of the URL
+     */
+    public function getContents($url)
+    {
+        return $this->remoteFileSystem->getContents($this->getOriginUrl($url), $url, false);
+    }
 
-	/**
-	 * Download file and decode the JSON string to PHP object
-	 *
-	 * @param string $json
-	 * @return stdClass
-	 */
-	public function getJson($url) {
-		$json = new \Composer\Json\JsonFile($url, $this->remoteFileSystem);
-		return $json->read();
-	}
+    /**
+     * Download file and decode the JSON string to PHP object
+     *
+     * @param  string $json
+     * @return stdClass
+     */
+    public function getJson($url)
+    {
+        $json = new \Composer\Json\JsonFile($url, $this->remoteFileSystem);
+        return $json->read();
+    }
 }
 ?>
