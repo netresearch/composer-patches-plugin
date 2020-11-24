@@ -130,7 +130,9 @@ class PatchSet
                     }
                     if ($hasConstraints !== null) {
                         if ($hasConstraints !== $isConstraint) {
-                            throw new Exception('Mixing patches with constraints and without constraints is not possible');
+                            throw new Exception(
+                                'Mixing patches with constraints and without constraints is not possible'
+                            );
                         }
                     } else {
                         $hasConstraints = $isConstraint;

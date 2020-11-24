@@ -134,7 +134,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         $this->io->write('<info>Maintaining patches</info>');
 
-        foreach ($event->getComposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages() as $initialPackage) {
+        $packages = $event->getComposer()->getRepositoryManager()->getLocalRepository()->getCanonicalPackages();
+
+        foreach ($packages as $initialPackage) {
             foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
                 /* @var $patches Patch[] */
                 list($patches, $package) = $patchesAndPackage;

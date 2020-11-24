@@ -32,7 +32,7 @@ class Installer extends MetapackageInstaller
      */
     protected $io;
 
-    function __construct(\Composer\IO\IOInterface $io)
+    public function __construct(\Composer\IO\IOInterface $io)
     {
         $this->io = $io;
     }

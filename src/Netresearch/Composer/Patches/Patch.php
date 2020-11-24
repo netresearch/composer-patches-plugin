@@ -213,7 +213,10 @@ class Patch
             $exitCode = $output = null;
             $patchCommand = exec('which patch', $output, $exitCode);
             if (0 !== $exitCode || !is_executable($patchCommand)) {
-                throw new Exception("Cannot find the 'patch' executable command - use your o/s package manager like 'sudo yum install patch'");
+                throw new Exception(
+                    "Cannot find the 'patch' executable command - "
+                    . "use your o/s package manager like 'sudo yum install patch'"
+                );
             }
         }
         return $patchCommand;
