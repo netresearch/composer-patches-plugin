@@ -162,7 +162,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
     /**
      * Get the patches and packages that are not already in $history
-     * 
+     *
      * @param  \Composer\Package\PackageInterface $initialPackage
      * @param  array                              &$history
      * @return array
@@ -248,4 +248,3 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         }
     }
 }
-?>

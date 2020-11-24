@@ -21,13 +21,13 @@ use Composer\Util\RemoteFilesystem;
 class Composer implements DownloaderInterface
 {
     /**
-     * @var RemoteFilesystem 
+     * @var RemoteFilesystem
      */
     protected $remoteFileSystem;
 
     /**
      * Construct the RFS
-     * 
+     *
      * @param \Composer\IO\IOInterface $io
      */
     public function __construct(\Composer\IO\IOInterface $io)
@@ -37,7 +37,7 @@ class Composer implements DownloaderInterface
 
     /**
      * Get the origin URL required by composer rfs
-     * 
+     *
      * @param  string $url
      * @return string
      */
@@ -48,7 +48,7 @@ class Composer implements DownloaderInterface
 
     /**
      * Download the file and return its contents
-     * 
+     *
      * @param  string $url The URL from where to download
      * @return string Contents of the URL
      */
@@ -69,4 +69,3 @@ class Composer implements DownloaderInterface
         return $json->read();
     }
 }
-?>

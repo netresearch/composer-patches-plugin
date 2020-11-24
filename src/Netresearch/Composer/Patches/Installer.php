@@ -39,7 +39,7 @@ class Installer extends MetapackageInstaller
 
     /**
      * Supports packages of type "patches"
-     * 
+     *
      * @param  string $packageType
      * @return boolean
      */

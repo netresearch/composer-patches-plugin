@@ -22,7 +22,7 @@ interface DownloaderInterface
 {
     /**
      * Download the file and return its contents
-     * 
+     *
      * @param  string $url The URL from where to download
      * @return string Contents of the URL
      */
@@ -36,4 +36,3 @@ interface DownloaderInterface
      */
     public function getJson($url);
 }
-?>

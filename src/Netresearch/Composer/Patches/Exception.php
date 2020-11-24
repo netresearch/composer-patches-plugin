@@ -30,4 +30,3 @@ class Exception extends \ErrorException
         parent::__construct($message);
     }
 }
-?>

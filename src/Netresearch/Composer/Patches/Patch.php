@@ -221,7 +221,7 @@ class Patch
 
     /**
      * Run the patch command
-     * 
+     *
      * @param  string  $toPath
      * @param  boolean $revert
      * @param  boolean $dryRun
@@ -266,7 +266,8 @@ class Patch
         2 => array('pipe', 'w')
         );
         $process = proc_open($command, $descriptorSpec, $pipes, $cwd);
-        $txOff = 0; $txLen = strlen($stdin);
+        $txOff = 0;
+        $txLen = strlen($stdin);
 
         $stdout = '';
         $stderr = '';
