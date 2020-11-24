@@ -29,8 +29,8 @@ class Composer implements DownloaderInterface {
 	 * 
 	 * @param \Composer\IO\IOInterface $io
 	 */
-	public function __construct(\Composer\IO\IOInterface $io) {
-		$this->remoteFileSystem = new RemoteFilesystem($io);
+	public function __construct(\Composer\IO\IOInterface $io, \Composer\Config $config) {
+		$this->remoteFileSystem = new RemoteFilesystem($io, $config);
 	}
 
 	/**

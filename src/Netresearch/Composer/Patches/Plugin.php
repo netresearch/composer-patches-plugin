@@ -15,6 +15,7 @@ namespace Netresearch\Composer\Patches;
 
 use Composer\Composer;
 use Composer\Downloader\DownloaderInterface;
+use Composer\Factory;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
@@ -60,14 +61,36 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 	public function activate(Composer $composer, IOInterface $io) {
 		$this->io = $io;
 		$this->composer = $composer;
-		$this->downloader = new Downloader\Composer($io);
+		$this->downloader = new Downloader\Composer($io, Factory::createConfig($io));
 
 		// Add the installer
 		$noopInstaller = new Installer($io);
 		$composer->getInstallationManager()->addInstaller($noopInstaller);
 	}
 
-	/**
+    /**
+     * Remove any hooks from Composer
+     *
+     * This will be called when a plugin is deactivated before being
+     * uninstalled, but also before it gets upgraded to a new version
+     * so the old one can be deactivated and the new one activated.
+     *
+     * @param Composer $composer
+     * @param IOInterface $io
+     */
+    public function deactivate(Composer $composer, IOInterface $io) {}
+
+    /**
+     * Prepare the plugin to be uninstalled
+     *
+     * This will be called after deactivate.
+     *
+     * @param Composer $composer
+     * @param IOInterface $io
+     */
+    public function uninstall(Composer $composer, IOInterface $io) { }
+
+    /**
 	 * Get the events, this {@see \Composer\EventDispatcher\EventSubscriberInterface}
 	 * subscribes to
 	 *

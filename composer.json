@@ -1,5 +1,6 @@
 {
     "name": "netresearch/composer-patches-plugin",
+    "version": "2.0.0",
     "type": "composer-plugin",
     "license": "GPL-2.0",
     "description": "Composer patches plugin",
@@ -18,10 +19,10 @@
         "psr-0": { "": "src/"}
     },
     "require": {
-        "composer-plugin-api": "^1.0"
+        "composer-plugin-api": "^2.0"
     },    
     "require-dev": {
-        "composer/composer": "1.*"
+        "composer/composer": "^2.0"
     },
     "extra": {
         "class": "Netresearch\\Composer\\Patches\\Plugin",
