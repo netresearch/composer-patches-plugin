@@ -15,6 +15,7 @@ namespace Netresearch\Composer\Patches;
 
 use Composer\Composer;
 use Composer\Downloader\DownloaderInterface;
+use Composer\Factory;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
@@ -54,18 +55,44 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Activate the plugin (called from {@see \Composer\Plugin\PluginManager})
      *
-     * @param \Composer\Composer       $composer
+     * @param \Composer\Composer $composer
      * @param \Composer\IO\IOInterface $io
      */
     public function activate(Composer $composer, IOInterface $io)
     {
         $this->io = $io;
         $this->composer = $composer;
-        $this->downloader = new Downloader\Composer($io);
+        $this->downloader = new Downloader\Composer($io, Factory::createConfig($io));
 
         // Add the installer
         $noopInstaller = new Installer($io);
         $composer->getInstallationManager()->addInstaller($noopInstaller);
+    }
+
+    /**
+     * Remove any hooks from Composer
+     *
+     * This will be called when a plugin is deactivated before being
+     * uninstalled, but also before it gets upgraded to a new version
+     * so the old one can be deactivated and the new one activated.
+     *
+     * @param Composer $composer
+     * @param IOInterface $io
+     */
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+    }
+
+    /**
+     * Prepare the plugin to be uninstalled
+     *
+     * This will be called after deactivate.
+     *
+     * @param Composer $composer
+     * @param IOInterface $io
+     */
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
     }
 
     /**
@@ -77,17 +104,17 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-        PackageEvents::PRE_PACKAGE_UNINSTALL => array('restore'),
-        PackageEvents::PRE_PACKAGE_UPDATE => array('restore'),
-        ScriptEvents::POST_UPDATE_CMD => array('apply'),
-        ScriptEvents::POST_INSTALL_CMD => array('apply'),
+            PackageEvents::PRE_PACKAGE_UNINSTALL => array('restore'),
+            PackageEvents::PRE_PACKAGE_UPDATE => array('restore'),
+            ScriptEvents::POST_UPDATE_CMD => array('apply'),
+            ScriptEvents::POST_INSTALL_CMD => array('apply'),
         );
     }
 
     /**
      * Revert patches on/from packages that are going to be removed
      *
-     * @param  PackageEvent $event
+     * @param PackageEvent $event
      * @throws Exception
      *
      * @return void
@@ -147,11 +174,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                         $patch->apply($packagePath, true);
                     } catch (PatchCommandException $applyException) {
                         try {
-                               // If this won't fail, patch was already applied
-                               $patch->revert($packagePath, true);
+                            // If this won't fail, patch was already applied
+                            $patch->revert($packagePath, true);
                         } catch (PatchCommandException $revertException) {
-                               // Patch seems not to be applied and fails as well
-                               $this->writePatchNotice('apply', $patch, $package, $applyException);
+                            // Patch seems not to be applied and fails as well
+                            $this->writePatchNotice('apply', $patch, $package, $applyException);
                         }
                         continue;
                     }
@@ -165,8 +192,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Get the patches and packages that are not already in $history
      *
-     * @param  \Composer\Package\PackageInterface $initialPackage
-     * @param  array                              &$history
+     * @param \Composer\Package\PackageInterface $initialPackage
+     * @param array &$history
      * @return array
      */
     protected function getPatches(PackageInterface $initialPackage, array &$history)
@@ -204,7 +231,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Get the install path for a package
      *
-     * @param  \Composer\Package\PackageInterface $package
+     * @param \Composer\Package\PackageInterface $package
      * @return string
      */
     protected function getPackagePath(PackageInterface $package)
@@ -215,9 +242,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Write a notice to IO
      *
-     * @param string                                  $action
-     * @param \Netresearch\Composer\Patches\Patch     $patch
-     * @param \Composer\Package\PackageInterface      $package
+     * @param string $action
+     * @param \Netresearch\Composer\Patches\Patch $patch
+     * @param \Composer\Package\PackageInterface $package
      * @param \Netresearch\Composer\Patches\Exception $exception
      */
     protected function writePatchNotice($action, Patch $patch, PackageInterface $package, $exception = null)
