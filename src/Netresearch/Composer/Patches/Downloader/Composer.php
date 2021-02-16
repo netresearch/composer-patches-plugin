@@ -27,7 +27,7 @@ class Composer implements DownloaderInterface
 
     /**
      * Construct the RFS
-     * 
+     *
      * @param \Composer\IO\IOInterface $io
      */
     public function __construct(\Composer\IO\IOInterface $io, \Composer\Config $config)
