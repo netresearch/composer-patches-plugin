@@ -18,64 +18,69 @@ use Composer\Util\RemoteFilesystem;
 /**
  * Downloader, which uses the composer RemoteFilesystem
  */
-class Composer implements DownloaderInterface {
-	/**
-	 * @var RemoteFilesystem 
-	 */
-	protected $remoteFileSystem;
-
-	/**
-	 * Construct the RFS
-	 * 
-	 * @param \Composer\IO\IOInterface $io
-	 */
-	public function __construct(\Composer\IO\IOInterface $io) {
-		$this->remoteFileSystem = new RemoteFilesystem($io);
-	}
-
-	/**
-	 * Get the origin URL required by composer rfs
-	 * 
-	 * @param string $url
-	 * @return string
-	 */
-	protected function getOriginUrl($url) {
-		return parse_url($url, PHP_URL_HOST);
-	}
-
-	/**
-	 * Translate 
-	 * @param type $url
-	 */
-	protected function resolveVendorPath($url) {
-	    // Alternative vendor path defined and patch file starts with `vendor/`
-	    if(getenv('COMPOSER_VENDOR_DIR') && strpos($url, 'vendor/') === 0) {
-		return getenv('COMPOSER_VENDOR_DIR') . DIRECTORY_SEPARATOR . \mb_substr($url, mb_strlen('vendor/'));
-	    }
-	    
-	    return $url;
-	}
-
-	/**
-	 * Download the file and return its contents
-	 * 
-	 * @param string $url The URL from where to download
-	 * @return string Contents of the URL
-	 */
-	public function getContents($url) {
-	    $path = $this->resolveVendorPath($url);
-		  return $this->cache[$url] = $this->remoteFileSystem->getContents($this->getOriginUrl($url), $path, false);
-	}
+class Composer implements DownloaderInterface
+{
+    /**
+     * @var RemoteFilesystem
+     */
+    protected $remoteFileSystem;
 
     /**
-	 * Download file and decode the JSON string to PHP object
-	 *
-	 * @param string $json
-	 * @return stdClass
-	 */
-	public function getJson($url) {
-		$json = new \Composer\Json\JsonFile($url, $this->remoteFileSystem);
-		return $json->read();
-	}
+     * Construct the RFS
+     *
+     * @param \Composer\IO\IOInterface $io
+     */
+    public function __construct(\Composer\IO\IOInterface $io, \Composer\Config $config)
+    {
+        $this->remoteFileSystem = new RemoteFilesystem($io, $config);
+    }
+
+    /**
+     * Get the origin URL required by composer rfs
+     *
+     * @param  string $url
+     * @return string
+     */
+    protected function getOriginUrl($url)
+    {
+        return parse_url($url, PHP_URL_HOST);
+    }
+
+    /**
+     * Translate 
+     * @param type $url
+     */
+    protected function resolveVendorPath($url)
+    {
+        // Alternative vendor path defined and patch file starts with `vendor/`
+        if (getenv('COMPOSER_VENDOR_DIR') && strpos($url, 'vendor/') === 0) {
+            return getenv('COMPOSER_VENDOR_DIR') . DIRECTORY_SEPARATOR . \mb_substr($url, mb_strlen('vendor/'));
+        }
+
+        return $url;
+    }
+
+    /**
+     * Download the file and return its contents
+     * 
+     * @param string $url The URL from where to download
+     * @return string Contents of the URL
+     */
+    public function getContents($url)
+    {
+        $path = $this->resolveVendorPath($url);
+        return $this->cache[$url] = $this->remoteFileSystem->getContents($this->getOriginUrl($url), $path, false);
+    }
+    
+    /**
+     * Download file and decode the JSON string to PHP object
+     *
+     * @param  string $json
+     * @return stdClass
+     */
+    public function getJson($url)
+    {
+        $json = new \Composer\Json\JsonFile($url, $this->remoteFileSystem);
+        return $json->read();
+    }
 }
-?>
