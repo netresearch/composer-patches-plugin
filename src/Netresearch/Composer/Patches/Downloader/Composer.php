@@ -54,7 +54,13 @@ class Composer implements DownloaderInterface
      */
     public function getContents($url)
     {
-        return $this->remoteFileSystem->getContents($this->getOriginUrl($url), $url, false);
+        $originUrl = $this->getOriginUrl($url);
+
+        if (is_null($originUrl)) {
+            return file_get_contents($url);
+        }
+
+        return $this->remoteFileSystem->getContents($originUrl, $url, false);
     }
 
     /**
