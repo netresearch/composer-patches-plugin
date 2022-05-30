@@ -6,13 +6,6 @@
     "keywords": [
         "composer", "patches", "plugin"
     ],
-    "authors": [
-        {
-            "name": "Christian Opitz",
-            "email": "christian.opitz@netresearch.de"
-        }
-        
-    ],
     "minimum-stability": "dev",
     "autoload": {
         "psr-0": { "": "src/"}
@@ -26,7 +19,7 @@
     "extra": {
         "class": "Netresearch\\Composer\\Patches\\Plugin",
         "branch-alias": {
-            "dev-master": "1.2.x-dev"
+            "dev-master": "1.4.x-dev"
         }
     }
 }
