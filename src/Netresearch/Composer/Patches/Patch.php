@@ -26,6 +26,8 @@ namespace Netresearch\Composer\Patches;
  */
 class Patch
 {
+    const PATCH_CMD = 'patch';
+
     /**
      * Info object created by {@see PatchSet::process()}
      *
@@ -210,8 +212,11 @@ class Patch
     {
         static $patchCommand = null;
         if (!$patchCommand) {
+            if ($this->isPatchDirectCallable(self::PATCH_CMD)) {
+                return self::PATCH_CMD;
+            }
             $exitCode = $output = null;
-            $patchCommand = exec('which patch', $output, $exitCode);
+            $patchCommand = exec($this->getWhichCmdByOS().' '.self::PATCH_CMD, $output, $exitCode);
             if (0 !== $exitCode || !is_executable($patchCommand)) {
                 throw new Exception(
                     "Cannot find the 'patch' executable command - "
@@ -220,6 +225,31 @@ class Patch
             }
         }
         return $patchCommand;
+    }
+
+    /**
+     * Returns true if the patch command can be called directly (without full path or calling which).
+     *
+     * @param string $patchCmd
+     *
+     * @return bool
+     */
+    private function isPatchDirectCallable($patchCmd)
+    {
+        $exitCode = $output = null;
+        exec($patchCmd.' -v 2>&1', $output, $exitCode);
+        return 0 === $exitCode;
+    }
+
+    /**
+     * Return the OS specific command to find an executable. It uses the DIRECTORY_SEPARATOR constant to detect windows.
+     *
+     * @return string
+     */
+    private function getWhichCmdByOS()
+    {
+        // backslash => windows
+        return '\\' === DIRECTORY_SEPARATOR ? 'where' : 'which';
     }
 
     /**
