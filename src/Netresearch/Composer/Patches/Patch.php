@@ -213,7 +213,7 @@ class Patch
         static $patchCommand = null;
         if (!$patchCommand) {
             if ($this->isPatchDirectCallable(self::PATCH_CMD)) {
-                return self::PATCH_CMD;
+                return $patchCommand = self::PATCH_CMD;
             }
             $exitCode = $output = null;
             $patchCommand = exec($this->getWhichCmdByOS().' '.self::PATCH_CMD, $output, $exitCode);
