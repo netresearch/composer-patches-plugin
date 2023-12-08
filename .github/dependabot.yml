@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      # Use Indian Standard Time (UTC +05:30)
+      timezone: "Asia/Kolkata"
+      time: "09:00"
+    allow:
+      # Allow both direct and indirect updates for all packages
+      - dependency-type: "all"
+    # Raise pull requests for version updates
+    # to pip against the `master` branch
+    target-branch: "master"
