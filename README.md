@@ -2,6 +2,25 @@
 
 This plugin allows you to provide patches for any package from any package.
 
+## Requirements
+
+- PHP 8.0 or higher
+- Composer 2.0 or higher
+
+## Installation
+
+```bash
+composer require netresearch/composer-patches-plugin
+```
+
+## Compatibility
+
+This plugin is fully compatible with:
+- Composer 2.0+ (including 2.4.4+)
+- PHP 8.0, 8.1, 8.2, 8.3
+
+## Usage
+
 If you don't want a patch package outside the root package, consider providing it as package in the [repositories key](https://getcomposer.org/doc/04-schema.md#repositories)
 
 ```json

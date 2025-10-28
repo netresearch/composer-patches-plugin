@@ -1,2 +1,7 @@
 /composer.lock
 /vendor
+/.phpunit.cache/
+/coverage.xml
+/coverage-html/
+/junit.xml
+/.php-cs-fixer.cache

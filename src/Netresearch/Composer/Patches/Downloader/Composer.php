@@ -99,14 +99,8 @@ class Composer implements DownloaderInterface
      */
     public function getJson($url)
     {
-        // Use appropriate JsonFile constructor based on downloader type
-        if ($this->downloader instanceof HttpDownloader) {
-            // Composer 2.x: Use HttpDownloader
-            $json = new \Composer\Json\JsonFile($url, $this->downloader);
-        } else {
-            // Composer 1.x: Use RemoteFilesystem
-            $json = new \Composer\Json\JsonFile($url, $this->downloader);
-        }
+        // Both HttpDownloader and RemoteFilesystem are accepted by JsonFile constructor
+        $json = new \Composer\Json\JsonFile($url, $this->downloader);
         
         return $json->read();
     }
