@@ -14,25 +14,45 @@ namespace Netresearch\Composer\Patches\Downloader;
  *                                                                        */
 
 use Composer\Util\RemoteFilesystem;
+use Composer\Util\HttpDownloader;
+use Composer\Config;
+use Composer\Factory;
 
 /**
- * Downloader, which uses the composer RemoteFilesystem
+ * Downloader, which uses the composer RemoteFilesystem or HttpDownloader (Composer 2.x)
  */
 class Composer implements DownloaderInterface
 {
     /**
-     * @var RemoteFilesystem
+     * @var RemoteFilesystem|HttpDownloader
      */
-    protected $remoteFileSystem;
+    protected $downloader;
 
     /**
-     * Construct the RFS
+     * @var \Composer\IO\IOInterface
+     */
+    protected $io;
+
+    /**
+     * Construct the downloader with backward compatibility for Composer 1.x and 2.x
      *
      * @param \Composer\IO\IOInterface $io
+     * @param \Composer\Composer $composer
      */
-    public function __construct(\Composer\IO\IOInterface $io, \Composer\Config $config)
+    public function __construct(\Composer\IO\IOInterface $io, \Composer\Composer $composer)
     {
-        $this->remoteFileSystem = new RemoteFilesystem($io, $config);
+        $this->io = $io;
+
+        // Check if HttpDownloader class exists (Composer 2.x)
+        if (class_exists('Composer\Util\HttpDownloader')) {
+            // Composer 2.x: Create HttpDownloader
+            $config = $composer->getConfig();
+            $this->downloader = new HttpDownloader($io, $config);
+        } else {
+            // Composer 1.x fallback: Use RemoteFilesystem
+            $config = $composer->getConfig() ?: Factory::createConfig($io);
+            $this->downloader = new RemoteFilesystem($io, $config);
+        }
     }
 
     /**
@@ -60,18 +80,34 @@ class Composer implements DownloaderInterface
             return file_get_contents($url);
         }
 
-        return $this->remoteFileSystem->getContents($originUrl, $url, false);
+        // Use appropriate method based on downloader type
+        if ($this->downloader instanceof HttpDownloader) {
+            // Composer 2.x: HttpDownloader
+            $response = $this->downloader->get($url);
+            return $response->getBody();
+        } else {
+            // Composer 1.x: RemoteFilesystem
+            return $this->downloader->getContents($originUrl, $url, false);
+        }
     }
 
     /**
      * Download file and decode the JSON string to PHP object
      *
-     * @param  string $json
-     * @return stdClass
+     * @param  string $url
+     * @return \stdClass
      */
     public function getJson($url)
     {
-        $json = new \Composer\Json\JsonFile($url, $this->remoteFileSystem);
+        // Use appropriate JsonFile constructor based on downloader type
+        if ($this->downloader instanceof HttpDownloader) {
+            // Composer 2.x: Use HttpDownloader
+            $json = new \Composer\Json\JsonFile($url, $this->downloader);
+        } else {
+            // Composer 1.x: Use RemoteFilesystem
+            $json = new \Composer\Json\JsonFile($url, $this->downloader);
+        }
+        
         return $json->read();
     }
 }
