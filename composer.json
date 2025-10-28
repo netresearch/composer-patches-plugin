@@ -30,7 +30,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "test-compatibility": "php test_compatibility.php",
+        "test-compatibility": "@php test_compatibility.php",
         "cs-fix": "php-cs-fixer fix",
         "cs-check": "php-cs-fixer fix --dry-run --diff",
         "static-analysis": [

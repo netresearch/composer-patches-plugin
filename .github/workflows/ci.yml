@@ -19,7 +19,8 @@ jobs:
         php: ['8.0', '8.1', '8.2', '8.3']
         composer: ['2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7']
         exclude:
-          # Exclude combinations that don't make sense
+          # Exclude newer Composer versions with older PHP for performance optimization
+          # (reduces CI matrix size while maintaining essential compatibility coverage)
           - php: '8.0'
             composer: '2.7'
 
@@ -55,7 +56,7 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run compatibility test
-      run: php test_compatibility.php
+      run: composer run-script test-compatibility
 
     - name: Run PHPUnit tests
       run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
