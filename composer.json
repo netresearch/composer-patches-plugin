@@ -7,19 +7,46 @@
         "composer", "patches", "plugin"
     ],
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-0": { "": "src/"}
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Netresearch\\Test\\": "tests/"
+        }
+    },
     "require": {
+        "php": "^8.0",
         "composer-plugin-api": "^2.0"
     },    
     "require-dev": {
-        "composer/composer": "^2.0"
+        "composer/composer": "^2.7.7",
+        "phpunit/phpunit": "^9.5 || ^10.0 || ^11.0",
+        "psalm/plugin-phpunit": "^0.18",
+        "vimeo/psalm": "^5.0",
+        "phpstan/phpstan": "^1.9",
+        "friendsofphp/php-cs-fixer": "^3.0"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-compatibility": "php test_compatibility.php",
+        "cs-fix": "php-cs-fixer fix",
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "static-analysis": [
+            "phpstan analyse src/ --level=7",
+            "psalm"
+        ]
     },
     "extra": {
         "class": "Netresearch\\Composer\\Patches\\Plugin",
         "branch-alias": {
             "dev-master": "1.4.x-dev"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "netresearch/composer-patches-plugin": true
         }
     }
 }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
          colors="true"
@@ -10,10 +9,30 @@
          stopOnFailure="false"
          syntaxCheck="false"
          bootstrap="./tests/bootstrap.php"
+         cacheDirectory=".phpunit.cache"
 >
     <testsuites>
-        <testsuite name="Full Composer Test Suite">
+        <testsuite name="Composer Patches Plugin Test Suite">
             <directory>./tests/Netresearch/Test/Composer</directory>
         </testsuite>
     </testsuites>
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">./src</directory>
+        </include>
+        <exclude>
+            <file>./src/Netresearch/Composer/Patches/Exception.php</file>
+            <file>./src/Netresearch/Composer/Patches/PatchCommandException.php</file>
+        </exclude>
+        <report>
+            <clover outputFile="coverage.xml"/>
+            <html outputDirectory="coverage-html"/>
+            <text outputFile="php://stdout" showUncoveredFiles="false"/>
+        </report>
+    </coverage>
+
+    <logging>
+        <junit outputFile="junit.xml"/>
+    </logging>
 </phpunit>

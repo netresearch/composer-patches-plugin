@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        php: ['8.0', '8.1', '8.2', '8.3']
+        composer: ['2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7']
+        exclude:
+          # Exclude combinations that don't make sense
+          - php: '8.0'
+            composer: '2.7'
+
+    name: PHP ${{ matrix.php }} - Composer ${{ matrix.composer }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP ${{ matrix.php }}
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: mbstring, xml, zip, curl
+        coverage: xdebug
+
+    - name: Setup Composer ${{ matrix.composer }}
+      run: |
+        composer self-update ${{ matrix.composer }}.*
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ matrix.composer }}-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ matrix.composer }}-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Run compatibility test
+      run: php test_compatibility.php
+
+    - name: Run PHPUnit tests
+      run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  code-quality:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    name: Code Quality
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, xml, zip, curl
+        tools: psalm, phpstan, php-cs-fixer
+
+    - name: Cache Composer packages
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-8.3-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Run PHP CS Fixer (dry-run)
+      run: php-cs-fixer fix --dry-run --diff --verbose
+
+    - name: Run PHPStan
+      run: phpstan analyse src/ --level=7
+
+    - name: Run Psalm
+      run: psalm --output-format=github
+
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    name: Security Audit
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, xml, zip, curl
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Security audit
+      run: composer audit
+
+    - name: Run security checker
+      uses: symfonycorp/security-checker-action@v5
