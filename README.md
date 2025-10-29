@@ -265,3 +265,36 @@ just require the package with the patches.
     }
 }
 ```
+
+## Removing patches
+
+When patches are no longer needed (e.g., they've been merged into the upstream package), you can remove them by:
+
+1. **Update the target package** to a version that includes the fixes
+2. **Remove the patch definitions** from your `composer.json` or patch package
+3. **Update composer.lock**: Run `composer update` to update the lock file
+4. **Remove patch files** (optional): You can now safely delete the `.patch` files
+
+The plugin will automatically handle the transition. When updating packages, if patch files have been deleted but are still referenced in `installed.json`, the plugin will skip reverting those patches and continue with the package update.
+
+**Note**: The plugin gracefully handles missing patch files during package updates and uninstalls. If a patch file cannot be found when reverting patches, a warning will be logged, but the operation will continue normally since the package will be reinstalled anyway.
+
+### Example workflow for removing patches
+
+```bash
+# 1. Update the patched package to a newer version that includes the fixes
+composer require vendor/package:^2.0
+
+# 2. Remove patch definitions from composer.json extra section
+# Edit your composer.json and remove the patch entries
+
+# 3. Update composer.lock
+composer update vendor/package-patches
+
+# 4. Delete the patch files (if stored locally)
+rm patches/my-old-patch.patch
+
+# 5. Commit the changes
+git add composer.json composer.lock
+git commit -m "Remove patches that were merged upstream"
+```
