@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Composer\Patches\Downloader;
 
 /*                                                                        *
@@ -15,11 +16,10 @@ namespace Netresearch\Composer\Patches\Downloader;
 
 use Composer\Util\RemoteFilesystem;
 use Composer\Util\HttpDownloader;
-use Composer\Config;
 use Composer\Factory;
 
 /**
- * Downloader, which uses the composer RemoteFilesystem or HttpDownloader (Composer 2.x)
+ * Downloader, which uses the composer RemoteFilesystem or HttpDownloader (Composer 2.x).
  */
 class Composer implements DownloaderInterface
 {
@@ -34,10 +34,10 @@ class Composer implements DownloaderInterface
     protected $io;
 
     /**
-     * Construct the downloader with backward compatibility for Composer 1.x and 2.x
+     * Construct the downloader with backward compatibility for Composer 1.x and 2.x.
      *
      * @param \Composer\IO\IOInterface $io
-     * @param \Composer\Composer $composer
+     * @param \Composer\Composer       $composer
      */
     public function __construct(\Composer\IO\IOInterface $io, \Composer\Composer $composer)
     {
@@ -56,9 +56,10 @@ class Composer implements DownloaderInterface
     }
 
     /**
-     * Get the origin URL required by composer rfs
+     * Get the origin URL required by composer rfs.
      *
-     * @param  string $url
+     * @param string $url
+     *
      * @return string
      */
     protected function getOriginUrl($url)
@@ -67,9 +68,10 @@ class Composer implements DownloaderInterface
     }
 
     /**
-     * Download the file and return its contents
+     * Download the file and return its contents.
      *
-     * @param  string $url The URL from where to download
+     * @param string $url The URL from where to download
+     *
      * @return string Contents of the URL
      */
     public function getContents($url)
@@ -84,6 +86,7 @@ class Composer implements DownloaderInterface
         if ($this->downloader instanceof HttpDownloader) {
             // Composer 2.x: HttpDownloader
             $response = $this->downloader->get($url);
+
             return $response->getBody();
         } else {
             // Composer 1.x: RemoteFilesystem
@@ -92,16 +95,17 @@ class Composer implements DownloaderInterface
     }
 
     /**
-     * Download file and decode the JSON string to PHP object
+     * Download file and decode the JSON string to PHP object.
      *
-     * @param  string $url
+     * @param string $url
+     *
      * @return \stdClass
      */
     public function getJson($url)
     {
         // Both HttpDownloader and RemoteFilesystem are accepted by JsonFile constructor
         $json = new \Composer\Json\JsonFile($url, $this->downloader);
-        
+
         return $json->read();
     }
 }

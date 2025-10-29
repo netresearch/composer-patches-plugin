@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Composer\Patches;
 
 /*                                                                        *
@@ -23,6 +24,7 @@ use Composer\Repository\InstalledRepositoryInterface;
  * is respected there.
  *
  * @deprecated Use package type 'metapackage' instead
+ *
  * @author     Christian Opitz <christian.opitz at netresearch.de>
  */
 class Installer extends MetapackageInstaller
@@ -38,10 +40,11 @@ class Installer extends MetapackageInstaller
     }
 
     /**
-     * Supports packages of type "patches"
+     * Supports packages of type "patches".
      *
-     * @param  string $packageType
-     * @return boolean
+     * @param string $packageType
+     *
+     * @return bool
      */
     public function supports($packageType)
     {
@@ -62,6 +65,7 @@ class Installer extends MetapackageInstaller
     public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         $this->handleDeprecatedType($package);
+
         return parent::isInstalled($repo, $package);
     }
 
