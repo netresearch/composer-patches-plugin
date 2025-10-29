@@ -17,14 +17,8 @@ jobs:
     strategy:
       matrix:
         php: ['8.0', '8.1', '8.2', '8.3', '8.4']
-        composer: ['2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7']
-        exclude:
-          # Exclude newer Composer versions with older PHP for performance optimization
-          # (reduces CI matrix size while maintaining essential compatibility coverage)
-          - php: '8.0'
-            composer: '2.7'
 
-    name: PHP ${{ matrix.php }} - Composer ${{ matrix.composer }}
+    name: PHP ${{ matrix.php }}
 
     steps:
     - uses: actions/checkout@v4
@@ -35,10 +29,7 @@ jobs:
         php-version: ${{ matrix.php }}
         extensions: mbstring, xml, zip, curl
         coverage: xdebug
-
-    - name: Setup Composer ${{ matrix.composer }}
-      run: |
-        composer self-update ${{ matrix.composer }}.*
+        tools: composer:v2
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
@@ -48,9 +39,9 @@ jobs:
       uses: actions/cache@v3
       with:
         path: vendor
-        key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ matrix.composer }}-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
-          ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ matrix.composer }}-
+          ${{ runner.os }}-php-${{ matrix.php }}-
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
@@ -60,14 +51,14 @@ jobs:
 
     - name: Run PHPUnit tests
       run: |
-        if [ "${{ matrix.php }}" = "8.0" ] && [ "${{ matrix.composer }}" = "2.0" ]; then
+        if [ "${{ matrix.php }}" = "8.0" ]; then
           XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
         else
           vendor/bin/phpunit --no-coverage
         fi
 
     - name: Upload coverage to Codecov
-      if: matrix.php == '8.0' && matrix.composer == '2.0'
+      if: matrix.php == '8.0'
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
