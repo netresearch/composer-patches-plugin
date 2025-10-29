@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Composer\Patches;
 
 /*                                                                        *
@@ -14,44 +15,45 @@ namespace Netresearch\Composer\Patches;
  *                                                                        */
 
 /**
- * Patch model class
+ * Patch model class.
  *
- * @property-read string $id The ID of the patch
- * @property-read string $type Type of the patch
- * @property-read string $url URL to the patch
- * @property-read string $title Title of the patch
- * @property-read string $args Patch command additional arguments
+ * @property string $id    The ID of the patch
+ * @property string $type  Type of the patch
+ * @property string $url   URL to the patch
+ * @property string $title Title of the patch
+ * @property string $args  Patch command additional arguments
  *
  * @author Christian Opitz <christian.opitz at netresearch.de>
  */
 class Patch
 {
-    const PATCH_CMD = 'patch';
+    public const PATCH_CMD = 'patch';
 
     /**
-     * Info object created by {@see PatchSet::process()}
+     * Info object created by {@see PatchSet::process()}.
      *
      * @var \stdClass
+     *
      * @
      */
     protected $info;
 
     /**
-     * The content of the patch file
+     * The content of the patch file.
      *
      * @var string
      */
     protected $content;
 
     /**
-     * File deletions/replacements inside the patch
+     * File deletions/replacements inside the patch.
      *
      * @var array
      */
     protected $fileDeletions;
 
     /**
-     * File additions inside the patch
+     * File additions inside the patch.
      *
      * @var array
      */
@@ -65,7 +67,7 @@ class Patch
     protected $checksum;
 
     /**
-     * Construct with $info from {@see PatchSet::process()}
+     * Construct with $info from {@see PatchSet::process()}.
      *
      * @param \stdClass $info
      */
@@ -88,9 +90,10 @@ class Patch
     }
 
     /**
-     * Get a info property
+     * Get a info property.
      *
-     * @param  string $name
+     * @param string $name
+     *
      * @return string|mixed
      */
     public function __get($name)
@@ -99,9 +102,10 @@ class Patch
     }
 
     /**
-     * Check if a info property is set
+     * Check if a info property is set.
      *
-     * @param  string $name
+     * @param string $name
+     *
      * @return string
      */
     public function __isset($name)
@@ -110,9 +114,10 @@ class Patch
     }
 
     /**
-     * Read in the patch
+     * Read in the patch.
      *
      * @return string
+     *
      * @throws Exception
      */
     protected function read()
@@ -122,11 +127,12 @@ class Patch
         }
 
         $this->content = $this->patchSet->getDownloader()->getContents($this->info->url);
+
         return $this->content;
     }
 
     /**
-     * Get the files, deleted (or replaced) by this patch
+     * Get the files, deleted (or replaced) by this patch.
      *
      * @return array
      */
@@ -135,11 +141,12 @@ class Patch
         if (is_array($this->fileDeletions)) {
             return $this->fileDeletions;
         }
+
         return $this->fileDeletions = $this->getActionFiles('-');
     }
 
     /**
-     * Get the files, added by this patch
+     * Get the files, added by this patch.
      *
      * @return type
      */
@@ -148,14 +155,17 @@ class Patch
         if (is_array($this->fileAdditions)) {
             return $this->fileAdditions;
         }
+
         return $this->fileAdditions = $this->getActionFiles('+');
     }
 
     /**
-     * Find the file additions/deletions within the patch file
+     * Find the file additions/deletions within the patch file.
      *
-     * @param  string $action '-' or '+'
+     * @param string $action '-' or '+'
+     *
      * @return array
+     *
      * @throws Exception
      */
     protected function getActionFiles($action)
@@ -163,7 +173,7 @@ class Patch
         $prefix = preg_quote(str_repeat($action, 3));
         $p1 = ($action == '-') ? 'a' : 'b';
         preg_match_all('/^' . $prefix . ' (.+)$/m', $this->read(), $matches);
-        $paths = array();
+        $paths = [];
         foreach ($matches[1] as $match) {
             if ($match === '/dev/null') {
                 continue;
@@ -174,14 +184,16 @@ class Patch
             }
             $paths[] = substr($match, $slashPos + 1);
         }
+
         return $paths;
     }
 
     /**
-     * Apply the patch
+     * Apply the patch.
      *
-     * @param  string  $toPath
-     * @param  boolean $dryRun
+     * @param string $toPath
+     * @param bool   $dryRun
+     *
      * @throws Exception
      * @throws PatchCommandException
      */
@@ -191,10 +203,10 @@ class Patch
     }
 
     /**
-     * Revert the patch
+     * Revert the patch.
      *
-     * @param string  $toPath
-     * @param boolean $dryRun
+     * @param string $toPath
+     * @param bool   $dryRun
      */
     public function revert($toPath, $dryRun = false)
     {
@@ -202,7 +214,7 @@ class Patch
     }
 
     /**
-     * Locate the patch executable
+     * Locate the patch executable.
      *
      * @throws Exception
      *
@@ -216,7 +228,7 @@ class Patch
                 return $patchCommand = self::PATCH_CMD;
             }
             $exitCode = $output = null;
-            $patchCommand = exec($this->getWhichCmdByOS().' '.self::PATCH_CMD, $output, $exitCode);
+            $patchCommand = exec($this->getWhichCmdByOS() . ' ' . self::PATCH_CMD, $output, $exitCode);
             if (0 !== $exitCode || !is_executable($patchCommand)) {
                 throw new Exception(
                     "Cannot find the 'patch' executable command - "
@@ -224,6 +236,7 @@ class Patch
                 );
             }
         }
+
         return $patchCommand;
     }
 
@@ -237,7 +250,8 @@ class Patch
     private function isPatchDirectCallable($patchCmd)
     {
         $exitCode = $output = null;
-        exec($patchCmd.' -v 2>&1', $output, $exitCode);
+        exec($patchCmd . ' -v 2>&1', $output, $exitCode);
+
         return 0 === $exitCode;
     }
 
@@ -253,11 +267,12 @@ class Patch
     }
 
     /**
-     * Run the patch command
+     * Run the patch command.
      *
-     * @param  string  $toPath
-     * @param  boolean $revert
-     * @param  boolean $dryRun
+     * @param string $toPath
+     * @param bool   $revert
+     * @param bool   $dryRun
+     *
      * @throws PatchCommandException
      */
     protected function runCommand($toPath, $revert = false, $dryRun = false)
@@ -280,24 +295,25 @@ class Patch
     }
 
     /**
-     * Process execution wrapper adapted from
+     * Process execution wrapper adapted from.
      *
-     * @link http://omegadelta.net/2012/02/08/stdin-stdout-stderr-with-proc_open-in-php/
+     * @see http://omegadelta.net/2012/02/08/stdin-stdout-stderr-with-proc_open-in-php/
      *
-     * @param  string $command
-     * @param  string $cwd
-     * @param  string $stdin
-     * @param  string $stdout
-     * @param  string $stderr
+     * @param string $command
+     * @param string $cwd
+     * @param string $stdin
+     * @param string $stdout
+     * @param string $stderr
+     *
      * @return int
      */
     protected function executeProcess($command, $cwd, $stdin, &$stdout, &$stderr = null)
     {
-        $descriptorSpec = array(
-        0 => array('pipe', 'r'),
-        1 => array('pipe', 'w'),
-        2 => array('pipe', 'w')
-        );
+        $descriptorSpec = [
+        0 => ['pipe', 'r'],
+        1 => ['pipe', 'w'],
+        2 => ['pipe', 'w'],
+        ];
         $process = proc_open($command, $descriptorSpec, $pipes, $cwd);
         $txOff = 0;
         $txLen = strlen($stdin);
@@ -318,7 +334,7 @@ class Patch
 
         while (true) {
             // The program's stdout/stderr
-            $rx = array();
+            $rx = [];
             if (!$stdoutDone) {
                 $rx[] = $pipes[1];
             }
@@ -326,7 +342,7 @@ class Patch
                 $rx[] = $pipes[2];
             }
             // The program's stdin
-            $tx = array();
+            $tx = [];
             if ($txOff < $txLen) {
                 $tx[] = $pipes[0];
             }

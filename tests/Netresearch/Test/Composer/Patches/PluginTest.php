@@ -7,13 +7,12 @@ use PHPUnit\Framework\TestCase;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Config;
-use Composer\EventDispatcher\EventDispatcher;
 use Composer\Plugin\PluginInterface;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\InstallationManager;
 
 /**
- * Tests for the main Plugin class
+ * Tests for the main Plugin class.
  */
 class PluginTest extends TestCase
 {
@@ -40,7 +39,7 @@ class PluginTest extends TestCase
     }
 
     /**
-     * Test that the plugin implements the required interfaces
+     * Test that the plugin implements the required interfaces.
      */
     public function testImplementsRequiredInterfaces(): void
     {
@@ -49,7 +48,7 @@ class PluginTest extends TestCase
     }
 
     /**
-     * Test plugin activation
+     * Test plugin activation.
      */
     public function testActivation(): void
     {
@@ -72,7 +71,7 @@ class PluginTest extends TestCase
     }
 
     /**
-     * Test getSubscribedEvents returns the expected events
+     * Test getSubscribedEvents returns the expected events.
      */
     public function testGetSubscribedEvents(): void
     {
@@ -92,23 +91,23 @@ class PluginTest extends TestCase
     }
 
     /**
-     * Test deactivate method exists
+     * Test deactivate method exists.
      */
     public function testDeactivateMethodExists(): void
     {
         $this->assertTrue(method_exists($this->plugin, 'deactivate'));
-        
+
         // Should not throw any exceptions
         $this->plugin->deactivate($this->composer, $this->io);
     }
 
     /**
-     * Test uninstall method exists
+     * Test uninstall method exists.
      */
     public function testUninstallMethodExists(): void
     {
         $this->assertTrue(method_exists($this->plugin, 'uninstall'));
-        
+
         // Should not throw any exceptions
         $this->plugin->uninstall($this->composer, $this->io);
     }

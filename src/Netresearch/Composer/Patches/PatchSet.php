@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Composer\Patches;
 
 /*                                                                        *
@@ -16,14 +17,14 @@ namespace Netresearch\Composer\Patches;
 use Composer\Package\Version\VersionParser;
 
 /**
- * Model, representing a patchSet
+ * Model, representing a patchSet.
  *
  * @author Christian Opitz <christian.opitz at netresearch.de>
  */
 class PatchSet
 {
     /**
-     * Path to this patchSet file (JSON)
+     * Path to this patchSet file (JSON).
      *
      * @var array|object|string
      */
@@ -40,14 +41,14 @@ class PatchSet
     protected $downloader;
 
     /**
-     * Contains the data downloaded from the URLs
+     * Contains the data downloaded from the URLs.
      *
      * @var array
      */
-    protected static $downloadCache = array();
+    protected static $downloadCache = [];
 
     /**
-     * Constructor - set the paths
+     * Constructor - set the paths.
      *
      * @param array|object|string            $source
      * @param Downloader\DownloaderInterface $downloader
@@ -59,9 +60,10 @@ class PatchSet
     }
 
     /**
-     * Get the downloader
+     * Get the downloader.
      *
      * @return Downloader\DownloaderInterface
+     *
      * @throws Exception
      */
     public function getDownloader()
@@ -69,6 +71,7 @@ class PatchSet
         if (!$this->downloader) {
             throw new Exception('No downloader set');
         }
+
         return $this->downloader;
     }
 
@@ -78,7 +81,7 @@ class PatchSet
     }
 
     /**
-     * Get the patches for a package, identified by name and version
+     * Get the patches for a package, identified by name and version.
      *
      * @param string $name
      * @param string $version
@@ -91,18 +94,18 @@ class PatchSet
     {
         if (!is_array($this->patches)) {
             $this->source = $this->read($this->source);
-            $this->patches = array();
+            $this->patches = [];
         }
         if (!array_key_exists($name, $this->patches)) {
             $this->source[$name] = $this->read($this->source, $name);
-            $this->patches[$name] = array();
+            $this->patches[$name] = [];
         }
         if (!array_key_exists($version, $this->patches[$name])) {
             $patchInfos = $this->read($this->source[$name]);
             if ($this->isPatch($patchInfos)) {
-                $rawPatches = array($patchInfos);
+                $rawPatches = [$patchInfos];
             } else {
-                $rawPatches = array();
+                $rawPatches = [];
                 $hasConstraints = null;
                 if (class_exists('Composer\Semver\Constraint\Constraint')) {
                     $constraintClass = 'Composer\Semver\Constraint\Constraint';
@@ -139,18 +142,19 @@ class PatchSet
                     }
                 }
             }
-            $patches = array();
+            $patches = [];
             foreach ($rawPatches as $rawPatch) {
                 $patch = new Patch((object) $rawPatch, $this);
                 $patches[$patch->getChecksum()] = $patch;
             }
             $this->patches[$name][$version] = $patches;
         }
+
         return $this->patches[$name][$version];
     }
 
     /**
-     * Determine if this config is a patches config
+     * Determine if this config is a patches config.
      *
      * @param array $config
      *
@@ -162,9 +166,10 @@ class PatchSet
     }
 
     /**
-     * Read in the JSON file
+     * Read in the JSON file.
      *
      * @return array|string
+     *
      * @throws Exception
      */
     protected function read($data, $key = null)
@@ -183,13 +188,15 @@ class PatchSet
         }
         if ($key !== null) {
             if (!array_key_exists($key, $data)) {
-                return array();
+                return [];
             }
             if (is_string($data[$key]) && array_key_exists($data[$key], $data)) {
                 $key = $data[$key];
             }
+
             return $this->read($data[$key]);
         }
+
         return $data;
     }
 }

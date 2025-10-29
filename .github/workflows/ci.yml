@@ -59,9 +59,15 @@ jobs:
       run: composer run-script test-compatibility
 
     - name: Run PHPUnit tests
-      run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+      run: |
+        if [ "${{ matrix.php }}" = "8.0" ] && [ "${{ matrix.composer }}" = "2.0" ]; then
+          XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+        else
+          vendor/bin/phpunit
+        fi
 
     - name: Upload coverage to Codecov
+      if: matrix.php == '8.0' && matrix.composer == '2.0'
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml

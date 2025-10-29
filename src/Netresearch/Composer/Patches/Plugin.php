@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Composer\Patches;
 
 /*                                                                        *
@@ -15,11 +16,9 @@ namespace Netresearch\Composer\Patches;
 
 use Composer\Composer;
 use Composer\Downloader\DownloaderInterface;
-use Composer\Factory;
 use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
-
 use Composer\Script\Event;
 use Composer\Installer\PackageEvent;
 use Composer\Script\ScriptEvents;
@@ -30,7 +29,7 @@ use Composer\Package\PackageInterface;
 
 /**
  * The patchSet integration for Composer, which applies the patches contained
- * with this package onto other packages
+ * with this package onto other packages.
  *
  * @author Christian Opitz <christian.opitz at netresearch.de>
  */
@@ -47,15 +46,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     protected $composer;
 
     /**
-     *
      * @var DownloaderInterface
      */
     protected $downloader;
 
     /**
-     * Activate the plugin (called from {@see \Composer\Plugin\PluginManager})
+     * Activate the plugin (called from {@see \Composer\Plugin\PluginManager}).
      *
-     * @param \Composer\Composer $composer
+     * @param \Composer\Composer       $composer
      * @param \Composer\IO\IOInterface $io
      */
     public function activate(Composer $composer, IOInterface $io)
@@ -70,13 +68,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
     /**
-     * Remove any hooks from Composer
+     * Remove any hooks from Composer.
      *
      * This will be called when a plugin is deactivated before being
      * uninstalled, but also before it gets upgraded to a new version
      * so the old one can be deactivated and the new one activated.
      *
-     * @param Composer $composer
+     * @param Composer    $composer
      * @param IOInterface $io
      */
     public function deactivate(Composer $composer, IOInterface $io)
@@ -84,11 +82,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
     /**
-     * Prepare the plugin to be uninstalled
+     * Prepare the plugin to be uninstalled.
      *
      * This will be called after deactivate.
      *
-     * @param Composer $composer
+     * @param Composer    $composer
      * @param IOInterface $io
      */
     public function uninstall(Composer $composer, IOInterface $io)
@@ -97,27 +95,26 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
     /**
      * Get the events, this {@see \Composer\EventDispatcher\EventSubscriberInterface}
-     * subscribes to
+     * subscribes to.
      *
      * @return array
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            PackageEvents::PRE_PACKAGE_UNINSTALL => array('restore'),
-            PackageEvents::PRE_PACKAGE_UPDATE => array('restore'),
-            ScriptEvents::POST_UPDATE_CMD => array('apply'),
-            ScriptEvents::POST_INSTALL_CMD => array('apply'),
-        );
+        return [
+            PackageEvents::PRE_PACKAGE_UNINSTALL => ['restore'],
+            PackageEvents::PRE_PACKAGE_UPDATE => ['restore'],
+            ScriptEvents::POST_UPDATE_CMD => ['apply'],
+            ScriptEvents::POST_INSTALL_CMD => ['apply'],
+        ];
     }
 
     /**
-     * Revert patches on/from packages that are going to be removed
+     * Revert patches on/from packages that are going to be removed.
      *
      * @param PackageEvent $event
-     * @throws Exception
      *
-     * @return void
+     * @throws Exception
      */
     public function restore(PackageEvent $event)
     {
@@ -130,13 +127,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             throw new Exception('Unexpected operation ' . get_class($operation));
         }
 
-        static $history = array();
+        static $history = [];
 
         foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
-            list($patches, $package) = $patchesAndPackage;
+            [$patches, $package] = $patchesAndPackage;
             $packagePath = $this->getPackagePath($package);
             foreach (array_reverse($patches) as $patch) {
-                /* @var $patch Patch */
+                // @var $patch Patch
                 try {
                     $patch->revert($packagePath, true);
                 } catch (PatchCommandException $e) {
@@ -157,7 +154,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function apply(Event $event)
     {
-        static $history = array();
+        static $history = [];
 
         $this->io->write('<info>Maintaining patches</info>');
 
@@ -165,11 +162,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         foreach ($packages as $initialPackage) {
             foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
-                /* @var $patches Patch[] */
-                list($patches, $package) = $patchesAndPackage;
+                // @var $patches Patch[]
+                [$patches, $package] = $patchesAndPackage;
                 $packagePath = $this->getPackagePath($package);
                 foreach ($patches as $patch) {
                     $this->writePatchNotice('test', $patch, $package);
+
                     try {
                         $patch->apply($packagePath, true);
                     } catch (PatchCommandException $applyException) {
@@ -190,36 +188,37 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
     /**
-     * Get the patches and packages that are not already in $history
+     * Get the patches and packages that are not already in $history.
      *
      * @param \Composer\Package\PackageInterface $initialPackage
-     * @param array &$history
+     * @param array                              &$history
+     *
      * @return array
      */
     protected function getPatches(PackageInterface $initialPackage, array &$history)
     {
         $packages = $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
-        $patchSets = array();
+        $patchSets = [];
         foreach ($packages as $package) {
             $extra = $package->getExtra();
             if (isset($extra['patches']) && $initialPackage->getName() != $package->getName()) {
-                $patchSets[$package->getName()] = array($extra['patches'], array($initialPackage));
+                $patchSets[$package->getName()] = [$extra['patches'], [$initialPackage]];
             }
         }
 
         $extra = $initialPackage->getExtra();
         if (isset($extra['patches'])) {
-            $patchSets[$initialPackage->getName()] = array($extra['patches'], $packages);
+            $patchSets[$initialPackage->getName()] = [$extra['patches'], $packages];
         }
 
-        $patchesAndPackages = array();
+        $patchesAndPackages = [];
         foreach ($patchSets as $sourceName => $patchConfAndPackages) {
             $patchSet = new PatchSet($patchConfAndPackages[0], $this->downloader);
             foreach ($patchConfAndPackages[1] as $package) {
                 $id = $sourceName . '->' . $package->getName();
                 $patches = $patchSet->getPatches($package->getName(), $package->getVersion());
                 if (!array_key_exists($id, $history) && count($patches)) {
-                    $patchesAndPackages[$id] = array($patches, $package);
+                    $patchesAndPackages[$id] = [$patches, $package];
                     $history[$id] = true;
                 }
             }
@@ -229,9 +228,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
     /**
-     * Get the install path for a package
+     * Get the install path for a package.
      *
      * @param \Composer\Package\PackageInterface $package
+     *
      * @return string
      */
     protected function getPackagePath(PackageInterface $package)
@@ -240,16 +240,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     }
 
     /**
-     * Write a notice to IO
+     * Write a notice to IO.
      *
-     * @param string $action
-     * @param \Netresearch\Composer\Patches\Patch $patch
-     * @param \Composer\Package\PackageInterface $package
+     * @param string                                  $action
+     * @param \Netresearch\Composer\Patches\Patch     $patch
+     * @param \Composer\Package\PackageInterface      $package
      * @param \Netresearch\Composer\Patches\Exception $exception
      */
     protected function writePatchNotice($action, Patch $patch, PackageInterface $package, $exception = null)
     {
-        $adverbMap = array('test' => 'on', 'apply' => 'to', 'revert' => 'from');
+        $adverbMap = ['test' => 'on', 'apply' => 'to', 'revert' => 'from'];
         if ($action == 'test' && !$this->io->isVeryVerbose()) {
             return;
         }
@@ -257,8 +257,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         if ($this->io->isVerbose() || !isset($patch->title)) {
             $msg .= ' <info>' . $patch->getChecksum() . '</info>';
         }
-        $msg .=    ' ' . $adverbMap[$action];
-        $msg .=    ' <info>' . $package->getName() . '</info>';
+        $msg .= ' ' . $adverbMap[$action];
+        $msg .= ' <info>' . $package->getName() . '</info>';
         if ($this->io->isVerbose()) {
             ' (<comment>' . $package->getPrettyVersion() . '</comment>)';
         }

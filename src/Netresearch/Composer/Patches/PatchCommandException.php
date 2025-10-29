@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Composer\Patches;
 
 /*                                                                        *
@@ -14,14 +15,14 @@ namespace Netresearch\Composer\Patches;
  *                                                                        */
 
 /**
- * Exception for patch command execution errors
+ * Exception for patch command execution errors.
  *
  * @author Christian Opitz <christian.opitz at netresearch.de>
  */
 class PatchCommandException extends Exception
 {
     /**
-     * Constructor - pass it {@see exec()} $output
+     * Constructor - pass it {@see exec()} $output.
      *
      * @param array $output
      */

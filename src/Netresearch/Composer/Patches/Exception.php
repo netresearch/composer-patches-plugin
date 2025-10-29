@@ -1,4 +1,5 @@
 <?php
+
 namespace Netresearch\Composer\Patches;
 
 /*                                                                        *
@@ -14,14 +15,14 @@ namespace Netresearch\Composer\Patches;
  *                                                                        */
 
 /**
- * Base Exception for PatchSet package
+ * Base Exception for PatchSet package.
  *
  * @author Christian Opitz <christian.opitz at netresearch.de>
  */
 class Exception extends \ErrorException
 {
     /**
-     * Constructor - message is required only
+     * Constructor - message is required only.
      *
      * @param string $message
      */

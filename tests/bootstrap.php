@@ -1,6 +1,6 @@
 <?php
 /**
- * Simple bootstrap for test environment
+ * Simple bootstrap for test environment.
  */
 
 // Include the composer autoloader
