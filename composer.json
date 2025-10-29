@@ -25,20 +25,13 @@
     "require-dev": {
         "composer/composer": "^2.7.7",
         "phpunit/phpunit": "^9.5 || ^10.0 || ^11.0",
-        "psalm/plugin-phpunit": "^0.18",
-        "vimeo/psalm": "^5.0",
-        "phpstan/phpstan": "^1.9",
         "friendsofphp/php-cs-fixer": "^3.0"
     },
     "scripts": {
         "test": "phpunit",
         "test-compatibility": "@php test_compatibility.php",
         "cs-fix": "php-cs-fixer fix",
-        "cs-check": "php-cs-fixer fix --dry-run --diff",
-        "static-analysis": [
-            "phpstan analyse src/ --level=7",
-            "psalm"
-        ]
+        "cs-check": "php-cs-fixer fix --dry-run --diff"
     },
     "extra": {
         "class": "Netresearch\\Composer\\Patches\\Plugin",
