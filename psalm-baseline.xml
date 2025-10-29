@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="5.26.1@d747f6500b38ac4f7dfc5edbcae6e4b637d7add0">
+  <file src="src/Netresearch/Composer/Patches/Downloader/Composer.php">
+    <ArgumentTypeCoercion>
+      <code><![CDATA[$url]]></code>
+    </ArgumentTypeCoercion>
+    <ImplementedReturnTypeMismatch>
+      <code><![CDATA[\stdClass]]></code>
+    </ImplementedReturnTypeMismatch>
+    <InternalClass>
+      <code><![CDATA[new RemoteFilesystem($io, $config)]]></code>
+    </InternalClass>
+    <InternalMethod>
+      <code><![CDATA[getContents]]></code>
+      <code><![CDATA[new RemoteFilesystem($io, $config)]]></code>
+    </InternalMethod>
+    <InvalidReturnStatement>
+      <code><![CDATA[$this->downloader->getContents($originUrl, $url, false)]]></code>
+    </InvalidReturnStatement>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$response->getBody()]]></code>
+    </NullableReturnStatement>
+    <PossiblyInvalidArgument>
+      <code><![CDATA[$this->downloader]]></code>
+    </PossiblyInvalidArgument>
+    <RedundantCondition>
+      <code><![CDATA[$composer->getConfig()]]></code>
+    </RedundantCondition>
+  </file>
+  <file src="src/Netresearch/Composer/Patches/Downloader/DownloaderInterface.php">
+    <UndefinedDocblockClass>
+      <code><![CDATA[stdClass]]></code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="src/Netresearch/Composer/Patches/Patch.php">
+    <FalsableReturnStatement>
+      <code><![CDATA[$patchCommand]]></code>
+    </FalsableReturnStatement>
+    <InvalidArgument>
+      <code><![CDATA[$stdout]]></code>
+    </InvalidArgument>
+    <InvalidReturnStatement>
+      <code><![CDATA[$this->fileAdditions]]></code>
+      <code><![CDATA[$this->fileAdditions = $this->getActionFiles('+')]]></code>
+      <code><![CDATA[isset($this->info->{$name})]]></code>
+    </InvalidReturnStatement>
+    <InvalidReturnType>
+      <code><![CDATA[string]]></code>
+      <code><![CDATA[type]]></code>
+    </InvalidReturnType>
+    <InvalidScalarArgument>
+      <code><![CDATA[0]]></code>
+      <code><![CDATA[0]]></code>
+      <code><![CDATA[0]]></code>
+    </InvalidScalarArgument>
+    <NullReference>
+      <code><![CDATA[$stdout]]></code>
+    </NullReference>
+    <PossiblyFalseArgument>
+      <code><![CDATA[$patchCommand]]></code>
+      <code><![CDATA[$slashPos]]></code>
+    </PossiblyFalseArgument>
+    <PossiblyFalseOperand>
+      <code><![CDATA[$slashPos]]></code>
+    </PossiblyFalseOperand>
+    <UndefinedDocblockClass>
+      <code><![CDATA[type]]></code>
+    </UndefinedDocblockClass>
+  </file>
+  <file src="src/Netresearch/Composer/Patches/PatchSet.php">
+    <ArgumentTypeCoercion>
+      <code><![CDATA[$requiredConstraint]]></code>
+      <code><![CDATA[(object) $rawPatch]]></code>
+    </ArgumentTypeCoercion>
+    <InvalidArrayOffset>
+      <code><![CDATA[$this->source[$name]]]></code>
+    </InvalidArrayOffset>
+    <PossiblyInvalidArgument>
+      <code><![CDATA[$patchInfos]]></code>
+    </PossiblyInvalidArgument>
+    <PossiblyInvalidArrayAccess>
+      <code><![CDATA[$this->source[$name]]]></code>
+    </PossiblyInvalidArrayAccess>
+    <PossiblyInvalidArrayAssignment>
+      <code><![CDATA[$this->source[$name]]]></code>
+    </PossiblyInvalidArrayAssignment>
+    <PossiblyInvalidArrayOffset>
+      <code><![CDATA[$this->source[$name]]]></code>
+    </PossiblyInvalidArrayOffset>
+    <PossiblyInvalidIterator>
+      <code><![CDATA[$patchInfo]]></code>
+      <code><![CDATA[$patchInfos]]></code>
+    </PossiblyInvalidIterator>
+  </file>
+  <file src="src/Netresearch/Composer/Patches/Plugin.php">
+    <InvalidArgument>
+      <code><![CDATA[$this->downloader]]></code>
+    </InvalidArgument>
+    <InvalidNullableReturnType>
+      <code><![CDATA[string]]></code>
+    </InvalidNullableReturnType>
+    <InvalidPropertyAssignmentValue>
+      <code><![CDATA[new Downloader\Composer($io, $composer)]]></code>
+    </InvalidPropertyAssignmentValue>
+    <LessSpecificImplementedReturnType>
+      <code><![CDATA[array]]></code>
+    </LessSpecificImplementedReturnType>
+    <NullableReturnStatement>
+      <code><![CDATA[$this->composer->getInstallationManager()->getInstallPath($package)]]></code>
+    </NullableReturnStatement>
+  </file>
+  <file src="tests/Netresearch/Test/Composer/Patches/Downloader/ComposerTest.php">
+    <PossiblyInvalidArgument>
+      <code><![CDATA[$this->composer]]></code>
+      <code><![CDATA[$this->composer]]></code>
+      <code><![CDATA[$this->composer]]></code>
+      <code><![CDATA[$this->composer]]></code>
+      <code><![CDATA[$this->composer]]></code>
+      <code><![CDATA[$this->composer]]></code>
+      <code><![CDATA[$this->io]]></code>
+      <code><![CDATA[$this->io]]></code>
+      <code><![CDATA[$this->io]]></code>
+      <code><![CDATA[$this->io]]></code>
+      <code><![CDATA[$this->io]]></code>
+      <code><![CDATA[$this->io]]></code>
+    </PossiblyInvalidArgument>
+    <PossiblyUndefinedMethod>
+      <code><![CDATA[expects]]></code>
+      <code><![CDATA[expects]]></code>
+      <code><![CDATA[expects]]></code>
+      <code><![CDATA[expects]]></code>
+      <code><![CDATA[expects]]></code>
+      <code><![CDATA[expects]]></code>
+    </PossiblyUndefinedMethod>
+    <UndefinedClass>
+      <code><![CDATA[$this->markTestSkipped('HttpDownloader class not available')]]></code>
+    </UndefinedClass>
+  </file>
+  <file src="tests/Netresearch/Test/Composer/Patches/PluginTest.php">
+    <PossiblyInvalidArgument>
+      <code><![CDATA[$this->composer]]></code>
+      <code><![CDATA[$this->composer]]></code>
+      <code><![CDATA[$this->composer]]></code>
+      <code><![CDATA[$this->io]]></code>
+      <code><![CDATA[$this->io]]></code>
+      <code><![CDATA[$this->io]]></code>
+    </PossiblyInvalidArgument>
+    <PossiblyUndefinedMethod>
+      <code><![CDATA[expects]]></code>
+      <code><![CDATA[expects]]></code>
+    </PossiblyUndefinedMethod>
+  </file>
+  <file src="tests/bootstrap.php">
+    <InvalidScalarArgument>
+      <code><![CDATA[30]]></code>
+    </InvalidScalarArgument>
+  </file>
+</files>

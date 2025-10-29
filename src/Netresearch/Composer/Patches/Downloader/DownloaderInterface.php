@@ -31,8 +31,8 @@ interface DownloaderInterface
     /**
      * Download file and decode the JSON string to PHP object
      *
-     * @param  string $json
-     * @return stdClass
+     * @param  string $url
+     * @return mixed
      */
     public function getJson($url);
 }
