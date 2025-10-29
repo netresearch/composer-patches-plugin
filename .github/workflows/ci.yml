@@ -16,7 +16,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        php: ['8.0', '8.1', '8.2', '8.3']
+        php: ['8.0', '8.1', '8.2', '8.3', '8.4']
         composer: ['2.0', '2.1', '2.2', '2.3', '2.4', '2.5', '2.6', '2.7']
         exclude:
           # Exclude newer Composer versions with older PHP for performance optimization
@@ -81,7 +81,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'
+        php-version: '8.4'
         extensions: mbstring, xml, zip, curl
         tools: psalm, phpstan, php-cs-fixer
 
@@ -89,9 +89,9 @@ jobs:
       uses: actions/cache@v3
       with:
         path: vendor
-        key: ${{ runner.os }}-php-8.3-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-php-8.4-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
-          ${{ runner.os }}-php-8.3-
+          ${{ runner.os }}-php-8.4-
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
@@ -117,7 +117,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'
+        php-version: '8.4'
         extensions: mbstring, xml, zip, curl
 
     - name: Install dependencies

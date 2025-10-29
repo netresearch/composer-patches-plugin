@@ -1,7 +1,7 @@
 {
     "name": "netresearch/composer-patches-plugin",
     "type": "composer-plugin",
-    "license": "GPL-2.0",
+    "license": "GPL-2.0-or-later",
     "description": "Composer patches plugin",
     "keywords": [
         "composer", "patches", "plugin"
@@ -9,7 +9,9 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
-        "psr-0": { "": "src/"}
+        "psr-4": {
+            "Netresearch\\Composer\\Patches\\": "src/Netresearch/Composer/Patches/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
