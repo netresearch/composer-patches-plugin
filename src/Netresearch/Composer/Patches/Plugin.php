@@ -129,7 +129,23 @@ class Plugin implements PluginInterface, EventSubscriberInterface
 
         static $history = [];
 
-        foreach ($this->getPatches($initialPackage, $history) as $patchesAndPackage) {
+        try {
+            $patchesAndPackages = $this->getPatches($initialPackage, $history);
+        } catch (Exception $e) {
+            // If we can't load patches (e.g., patch files deleted), log a warning and continue
+            // The package will be reinstalled/removed anyway
+            $this->io->write(
+                '  <warning>Could not load patches for ' . $initialPackage->getName() .
+                ': ' . $e->getMessage() . '</warning>'
+            );
+            $this->io->write(
+                '  <info>Continuing without reverting patches - package will be reinstalled</info>'
+            );
+
+            return;
+        }
+
+        foreach ($patchesAndPackages as $patchesAndPackage) {
             [$patches, $package] = $patchesAndPackage;
             $packagePath = $this->getPackagePath($package);
             foreach (array_reverse($patches) as $patch) {
