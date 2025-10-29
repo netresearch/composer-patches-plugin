@@ -102,7 +102,7 @@ class PluginRestoreTest extends TestCase
         // No warnings should be written for packages without patches
         // This should work normally without any output
         $this->plugin->restore($event);
-        
+
         // If we get here without exception, the test passes
         $this->assertTrue(true);
     }
@@ -131,7 +131,7 @@ class PluginRestoreTest extends TestCase
 
         // This should work normally
         $this->plugin->restore($event);
-        
+
         // If we get here without exception, the test passes
         $this->assertTrue(true);
     }
