@@ -63,7 +63,7 @@ jobs:
         if [ "${{ matrix.php }}" = "8.0" ] && [ "${{ matrix.composer }}" = "2.0" ]; then
           XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
         else
-          vendor/bin/phpunit
+          vendor/bin/phpunit --no-coverage
         fi
 
     - name: Upload coverage to Codecov
