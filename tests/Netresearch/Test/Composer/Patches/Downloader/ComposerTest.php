@@ -123,8 +123,14 @@ class ComposerTest extends TestCase
         
         try {
             $jsonData = $downloader->getJson($tempFile);
-            $this->assertEquals('data', $jsonData->test);
-            $this->assertEquals(42, $jsonData->number);
+            // JsonFile::read() returns an array or object depending on the JSON content
+            if (is_array($jsonData)) {
+                $this->assertEquals('data', $jsonData['test']);
+                $this->assertEquals(42, $jsonData['number']);
+            } else {
+                $this->assertEquals('data', $jsonData->test);
+                $this->assertEquals(42, $jsonData->number);
+            }
         } finally {
             unlink($tempFile);
         }
