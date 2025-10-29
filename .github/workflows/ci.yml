@@ -21,7 +21,7 @@ jobs:
     name: PHP ${{ matrix.php }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Setup PHP ${{ matrix.php }}
       uses: shivammathur/setup-php@v2
@@ -73,7 +73,7 @@ jobs:
     name: Code Quality
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -102,7 +102,7 @@ jobs:
     name: Security Audit
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
