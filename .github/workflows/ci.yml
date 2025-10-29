@@ -89,7 +89,6 @@ jobs:
       with:
         php-version: '8.4'
         extensions: mbstring, xml, zip, curl
-        tools: php-cs-fixer
 
     - name: Cache Composer packages
       uses: actions/cache@v3
@@ -103,7 +102,7 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Run PHP CS Fixer (dry-run)
-      run: php-cs-fixer fix --dry-run --diff --verbose --allow-unsupported-php-version=true
+      run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose --allow-unsupported-php-version=true
 
   security:
     runs-on: ubuntu-latest
