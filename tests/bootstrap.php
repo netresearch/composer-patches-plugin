@@ -7,4 +7,4 @@
 $autoloader = require_once __DIR__ . '/../vendor/autoload.php';
 
 // Set a reasonable timeout for tests
-ini_set('default_socket_timeout', 30);
+ini_set('default_socket_timeout', '30');
