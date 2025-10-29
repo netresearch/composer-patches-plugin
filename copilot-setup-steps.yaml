@@ -1,0 +1,23 @@
+# GitHub Copilot Setup Steps
+# These steps prepare the development environment for the composer-patches-plugin
+
+steps:
+  - name: Validate Composer Configuration
+    run: composer validate --strict
+    description: Ensure composer.json and composer.lock are valid
+    
+  - name: Install PHP Dependencies
+    run: composer install --prefer-dist --no-progress
+    description: Install all Composer dependencies including dev dependencies
+    
+  - name: Run Compatibility Tests
+    run: composer test-compatibility
+    description: Verify compatibility across different PHP and Composer versions
+    
+  - name: Run Unit Tests
+    run: composer test
+    description: Execute PHPUnit test suite to ensure all tests pass
+    
+  - name: Check Code Style
+    run: composer cs-check
+    description: Verify code follows PSR-12 and project-specific coding standards
