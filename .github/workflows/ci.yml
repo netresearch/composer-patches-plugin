@@ -21,10 +21,10 @@ jobs:
     name: PHP ${{ matrix.php }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
     - name: Setup PHP ${{ matrix.php }}
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
       with:
         php-version: ${{ matrix.php }}
         extensions: mbstring, xml, zip, curl
@@ -36,7 +36,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v5
+      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
@@ -59,7 +59,7 @@ jobs:
 
     - name: Upload coverage to Codecov
       if: matrix.php == '8.0'
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
       with:
         file: ./coverage.xml
         flags: unittests
@@ -73,16 +73,16 @@ jobs:
     name: Code Quality
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
     - name: Setup PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
       with:
         php-version: '8.4'
         extensions: mbstring, xml, zip, curl
 
     - name: Cache Composer packages
-      uses: actions/cache@v5
+      uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
       with:
         path: vendor
         key: ${{ runner.os }}-php-8.4-${{ hashFiles('**/composer.lock') }}
@@ -102,10 +102,10 @@ jobs:
     name: Security Audit
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
     - name: Setup PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
       with:
         php-version: '8.4'
         extensions: mbstring, xml, zip, curl
@@ -117,4 +117,4 @@ jobs:
       run: composer audit
 
     - name: Run security checker
-      uses: symfonycorp/security-checker-action@v5
+      uses: symfonycorp/security-checker-action@88efed75353c0480777568aa3969c6f2b8f6c635 # v5
