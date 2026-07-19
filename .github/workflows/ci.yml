@@ -10,111 +10,26 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  php-ci:
+    uses: netresearch/.github/.github/workflows/php-ci.yml@main
     permissions:
       contents: read
-    strategy:
-      matrix:
-        php: ['8.0', '8.1', '8.2', '8.3', '8.4']
-
-    name: PHP ${{ matrix.php }}
-
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-
-    - name: Setup PHP ${{ matrix.php }}
-      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
-      with:
-        php-version: ${{ matrix.php }}
-        extensions: mbstring, xml, zip, curl
-        coverage: xdebug
-        tools: composer:v2
-
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-${{ matrix.php }}-
-
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
-
-    - name: Run compatibility test
-      run: composer run-script test-compatibility
-
-    - name: Run PHPUnit tests
-      run: |
-        if [ "${{ matrix.php }}" = "8.0" ]; then
-          XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
-        else
-          vendor/bin/phpunit --no-coverage
-        fi
-
-    - name: Upload coverage to Codecov
-      if: matrix.php == '8.0'
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-      with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-
-  code-quality:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    name: Code Quality
-
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-
-    - name: Setup PHP
-      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
-      with:
-        php-version: '8.4'
-        extensions: mbstring, xml, zip, curl
-
-    - name: Cache Composer packages
-      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-8.4-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-8.4-
-
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
-
-    - name: Run PHP CS Fixer (dry-run)
-      run: vendor/bin/php-cs-fixer fix --dry-run --diff --verbose --allow-unsupported-php-version=true
-
-  security:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    name: Security Audit
-
-    steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-
-    - name: Setup PHP
-      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
-      with:
-        php-version: '8.4'
-        extensions: mbstring, xml, zip, curl
-
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
-
-    - name: Security audit
-      run: composer audit
-
-    - name: Run security checker
-      uses: symfonycorp/security-checker-action@258311ef7ac571f1310780ef3d79fc5abef642b5 # v5
+    with:
+      php-versions: '["8.0","8.1","8.2","8.3","8.4"]'
+      extensions: "mbstring, xml, zip, curl"
+      coverage: "xdebug"
+      # No PHPStan/Rector in this repo.
+      run-phpstan: false
+      # test_compatibility.php runs before the unit tests (matches the old
+      # `composer run-script test-compatibility` step); Clover is written so
+      # the codecov upload below has a report on the coverage PHP version.
+      phpunit-cmd: "composer run-script test-compatibility && vendor/bin/phpunit --coverage-clover=coverage.xml"
+      run-cs-fixer: true
+      cs-fixer-cmd: "vendor/bin/php-cs-fixer fix --dry-run --diff --verbose --allow-unsupported-php-version=true"
+      run-composer-audit: true
+      upload-coverage-codecov: true
+      coverage-php-version: "8.0"
+      coverage-file: "./coverage.xml"
+      coverage-flags: "unittests"
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
