@@ -1,26 +1,21 @@
 name: Auto-merge dependency PRs
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  # auto-merge only calls `gh pr merge` via the reusable with the base-repo
+  # token; it never checks out or runs PR head code, so pull_request_target
+  # (required for a write token on Dependabot/Renovate fork PRs) is safe here.
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   auto-merge:
-    runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' || github.actor == 'renovate[bot]'
-    steps:
-      - name: Approve PR
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr review --approve "$PR_URL"
-
-      - name: Enable auto-merge
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --rebase "$PR_URL"
+    uses: netresearch/.github/.github/workflows/auto-merge-deps.yml@main
+    permissions:
+      contents: write
+      pull-requests: write
+    # Merge with the org App so the merge commit gets a CI run (#450).
+    # Only these two secrets are passed, not `secrets: inherit`.
+    secrets:
+      merge-app-id: ${{ secrets.PROJECT_APP_ID }}
+      merge-app-private-key: ${{ secrets.PROJECT_APP_PRIVATE_KEY }}
