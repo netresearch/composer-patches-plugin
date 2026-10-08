@@ -63,7 +63,7 @@ Key | Description | Required
 --- | --- | ---
 ``url`` | The url or path to the patch | ✓
 ``title`` | Title to display when applying or reverting the patch |
-``args`` | string, which will be added to the patch command |
+``args`` | string of space separated patch options, passed to the patch command without a shell. Supported: ``-pN``/``--strip=N``, ``-FN``/``--fuzz=N``, ``-l``/``--ignore-whitespace``, ``-N``/``--forward``, ``-t``/``--batch``, ``-E``/``--remove-empty-files``, ``--binary``, ``-s``/``--silent``/``--quiet``. Any other value is rejected with an error. |
 ``sha1`` | SHA1 checksum of the patch contents for security check - when given the patches actual checksum and this value are compared and if they don't match an exception will be thrown |
 
 You may provide patches per package and optionally by version constraints:

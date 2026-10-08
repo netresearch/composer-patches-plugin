@@ -21,13 +21,19 @@ namespace Netresearch\Composer\Patches;
  * @property string $type  Type of the patch
  * @property string $url   URL to the patch
  * @property string $title Title of the patch
- * @property string $args  Patch command additional arguments
+ * @property string $args  Additional patch command options, see the README
  *
  * @author Christian Opitz <christian.opitz at netresearch.de>
  */
 class Patch
 {
     public const PATCH_CMD = 'patch';
+
+    /**
+     * Options of the patch command that a patch definition may pass in "args".
+     * Options that name a file or directory are not supported.
+     */
+    private const ALLOWED_ARGS_PATTERN = '/^(?:-p\d+|--strip=\d+|-F\d+|--fuzz=\d+|-l|--ignore-whitespace|-N|--forward|-t|--batch|-E|--remove-empty-files|--binary|-s|--silent|--quiet)$/D';
 
     /**
      * Info object created by {@see PatchSet::process()}.
@@ -67,6 +73,13 @@ class Patch
     protected $checksum;
 
     /**
+     * Validated additional options of the patch command.
+     *
+     * @var string[]
+     */
+    protected $arguments = [];
+
+    /**
      * Construct with $info from {@see PatchSet::process()}.
      *
      * @param \stdClass $info
@@ -75,10 +88,42 @@ class Patch
     {
         $this->info = $info;
         $this->patchSet = $patchSet;
+        $this->arguments = self::parseArguments($info->args ?? null);
         $this->checksum = sha1($this->read());
         if (isset($this->info->sha1) && strtolower($this->info->sha1) !== $this->checksum) {
             throw new Exception("Expected checksum '{$this->info->sha1}' but got '{$this->checksum}'");
         }
+    }
+
+    /**
+     * Split the "args" of a patch definition into patch command options.
+     *
+     * The options are passed to the patch command as separate arguments (no shell is involved),
+     * so only plain option tokens from a fixed list are accepted.
+     *
+     * @param mixed $args
+     *
+     * @return string[]
+     *
+     * @throws Exception
+     */
+    private static function parseArguments($args)
+    {
+        if ($args === null || $args === '') {
+            return [];
+        }
+        if (!is_string($args)) {
+            throw new Exception("The 'args' of a patch must be a string");
+        }
+        $arguments = [];
+        foreach (preg_split('/[ \t]+/', trim($args, " \t")) as $argument) {
+            if (preg_match(self::ALLOWED_ARGS_PATTERN, $argument) !== 1) {
+                throw new Exception("Unsupported patch option '{$argument}' in 'args'");
+            }
+            $arguments[] = $argument;
+        }
+
+        return $arguments;
     }
 
     /**
@@ -277,20 +322,20 @@ class Patch
      */
     protected function runCommand($toPath, $revert = false, $dryRun = false)
     {
-        $command = $this->whichPatchCmd() . ' -f -p1 --no-backup-if-mismatch -r -';
+        $command = [$this->whichPatchCmd(), '-f', '-p1', '--no-backup-if-mismatch', '-r', '-'];
 
         if ($revert) {
-            $command .= ' -R';
+            $command[] = '-R';
         }
-        if (isset($this->info->args)) {
-            $command .= ' ' . $this->info->args;
+        foreach ($this->arguments as $argument) {
+            $command[] = $argument;
         }
         if ($dryRun) {
-            $command .= ' --dry-run';
+            $command[] = '--dry-run';
         }
 
         if ($this->executeProcess($command, $toPath, $this->read(), $stdout) > 0) {
-            throw new PatchCommandException($command, $stdout, $this, $dryRun);
+            throw new PatchCommandException(implode(' ', $command), $stdout, $this, $dryRun);
         }
     }
 
@@ -299,11 +344,11 @@ class Patch
      *
      * @see http://omegadelta.net/2012/02/08/stdin-stdout-stderr-with-proc_open-in-php/
      *
-     * @param string $command
-     * @param string $cwd
-     * @param string $stdin
-     * @param string $stdout
-     * @param string $stderr
+     * @param string[] $command Program and arguments, executed without a shell
+     * @param string   $cwd
+     * @param string   $stdin
+     * @param string   $stdout
+     * @param string   $stderr
      *
      * @return int
      */
