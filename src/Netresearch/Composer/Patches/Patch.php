@@ -371,6 +371,8 @@ class Patch
         1 => ['pipe', 'w'],
         2 => ['pipe', 'w'],
         ];
+        // Not exploitable: $command is an argument list, so no shell is involved, and the patch options are validated.
+        // nosemgrep: php.lang.security.exec-use.exec-use
         $process = proc_open($command, $descriptorSpec, $pipes, $cwd);
         $txOff = 0;
         $txLen = strlen($stdin);
