@@ -47,6 +47,8 @@ try {
         $jsonData = $downloader->getJson($tempFile);
         echo '✓ getJson() works: ' . json_encode($jsonData) . "\n";
     } finally {
+        // Not exploitable: $tempFile comes from tempnam() in this script.
+        // nosemgrep: php.lang.security.unlink-use.unlink-use
         unlink($tempFile);
     }
 
