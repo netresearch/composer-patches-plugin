@@ -115,9 +115,17 @@ class Patch
         if (!is_string($args)) {
             throw new Exception("The 'args' of a patch must be a string");
         }
+        $tokens = preg_split('/[ \t]+/', trim($args, " \t"), -1, PREG_SPLIT_NO_EMPTY);
         $arguments = [];
-        foreach (preg_split('/[ \t]+/', trim($args, " \t")) as $argument) {
-            if (preg_match(self::ALLOWED_ARGS_PATTERN, $argument) !== 1) {
+        for ($i = 0; $i < count($tokens); ++$i) {
+            $argument = $tokens[$i];
+            if (in_array($argument, ['-p', '-F', '--strip', '--fuzz'], true)) {
+                // Option and number as separate words, e.g. "-p 0".
+                if (!isset($tokens[$i + 1]) || preg_match('/^\d+$/D', $tokens[$i + 1]) !== 1) {
+                    throw new Exception("Option '{$argument}' in 'args' needs a number");
+                }
+                $argument .= ($argument[1] === '-' ? '=' : '') . $tokens[++$i];
+            } elseif (preg_match(self::ALLOWED_ARGS_PATTERN, $argument) !== 1) {
                 throw new Exception("Unsupported patch option '{$argument}' in 'args'");
             }
             $arguments[] = $argument;

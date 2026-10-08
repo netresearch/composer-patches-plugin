@@ -78,6 +78,17 @@ class PatchArgumentsTest extends TestCase
         $this->assertSame("world\n", file_get_contents($this->dir . '/a.txt'));
     }
 
+    public function testNumbersAsSeparateWordsAndBlankArgsAreAccepted(): void
+    {
+        foreach (['-p 1', '--strip 1 -F 3', ' ', "\t"] as $args) {
+            file_put_contents($this->dir . '/a.txt', "hello\n");
+            foreach ($this->patchesWithArgs($args) as $patch) {
+                $patch->apply($this->dir);
+            }
+            $this->assertSame("world\n", file_get_contents($this->dir . '/a.txt'), $args);
+        }
+    }
+
     public function testShellSyntaxInArgsIsNotInterpreted(): void
     {
         $marker = $this->dir . '/marker';
@@ -121,6 +132,8 @@ class PatchArgumentsTest extends TestCase
             'redirect' => '-l > marker',
             'newline' => "-l\ntouch marker",
             'array value' => ['-l'],
+            'option without number' => '-p',
+            'option with a word instead of a number' => '-p touch',
         ];
     }
 }
