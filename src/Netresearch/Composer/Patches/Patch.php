@@ -281,6 +281,8 @@ class Patch
                 return $patchCommand = self::PATCH_CMD;
             }
             $exitCode = $output = null;
+            // Not exploitable: the command is 'which'/'where' plus the constant PATCH_CMD; no external input.
+            // nosemgrep: php.lang.security.exec-use.exec-use
             $patchCommand = exec($this->getWhichCmdByOS() . ' ' . self::PATCH_CMD, $output, $exitCode);
             if (0 !== $exitCode || !is_executable($patchCommand)) {
                 throw new Exception(
@@ -303,6 +305,8 @@ class Patch
     private function isPatchDirectCallable($patchCmd)
     {
         $exitCode = $output = null;
+        // Not exploitable: the only caller passes the constant PATCH_CMD.
+        // nosemgrep: php.lang.security.exec-use.exec-use
         exec($patchCmd . ' -v 2>&1', $output, $exitCode);
 
         return 0 === $exitCode;
