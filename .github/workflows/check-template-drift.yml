@@ -1,0 +1,17 @@
+name: Template Drift
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  merge_group:
+
+permissions: {}
+
+jobs:
+  drift:
+    uses: netresearch/.github/.github/workflows/check-template-drift.yml@main
+    with:
+      template: php-module
+    permissions:
+      contents: read
